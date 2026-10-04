@@ -33,6 +33,25 @@ describe("computeMatadors", () => {
     expect(computeMatadors([j("spades"), j("hearts")], "grand")).toEqual({ mit: false, count: 1 });
     expect(computeMatadors([], "grand")).toEqual({ mit: false, count: 4 });
   });
+
+  it("counts trump-suit cards after the jacks in suit games", () => {
+    const heartsSix: Card[] = [
+      j("clubs"),
+      j("spades"),
+      j("hearts"),
+      j("diamonds"),
+      { suit: "hearts", rank: "A" },
+      { suit: "hearts", rank: "10" },
+    ];
+    expect(computeMatadors(heartsSix, "suit", "hearts")).toEqual({ mit: true, count: 6 });
+    // All four jacks but no trump Ace → "mit 4".
+    expect(computeMatadors([j("clubs"), j("spades"), j("hearts"), j("diamonds")], "suit", "hearts")).toEqual({
+      mit: true,
+      count: 4,
+    });
+    // Missing ♣J, ♠J, ♥J but holding ♦J → "ohne 3".
+    expect(computeMatadors([j("diamonds")], "suit", "hearts")).toEqual({ mit: false, count: 3 });
+  });
 });
 
 describe("computeGameValue", () => {

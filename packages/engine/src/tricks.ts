@@ -50,8 +50,9 @@ export function cardStrength(card: Card, mode: TrumpMode, leadSuit: Suit): numbe
   return -1;
 }
 
-/** Index (0-based, in play order) of the card that takes the trick. */
+/** Index (0-based, in play order) of the card that takes the trick; -1 for an empty trick. */
 export function trickWinnerIndex(cards: readonly Card[], mode: TrumpMode, leadSuit: Suit): number {
+  if (cards.length === 0) return -1;
   let best = 0;
   let bestStrength = cardStrength(cards[0], mode, leadSuit);
   for (let i = 1; i < cards.length; i++) {

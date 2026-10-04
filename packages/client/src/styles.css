@@ -1,0 +1,652 @@
+/* Skat Online – deliberately minimal v1 styling (no images, no sounds). */
+
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --border: #c9d1d9;
+  --text: #1c2530;
+  --muted: #6b7684;
+  --accent: #1f6feb;
+  --accent-text: #ffffff;
+  --danger: #b42318;
+  --ok: #1a7f37;
+  --red: #c8102e;
+  --black: #14181d;
+  --felt: #14624a;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1 {
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.6rem;
+}
+
+h3 {
+  font-size: 0.95rem;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+button {
+  font: inherit;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+}
+
+label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.screen {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.screen-center {
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  background: #eef2f7;
+}
+
+.badge-muted {
+  color: var(--muted);
+}
+
+.badge-ok {
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row.wrap {
+  flex-wrap: wrap;
+}
+
+.row.space-between {
+  justify-content: space-between;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+.error-text {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0.3rem 0;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Toasts for server errors. */
+.toast {
+  position: fixed;
+  top: 0.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  background: #fdecea;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  color: var(--danger);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.toast-close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.1rem;
+  padding: 0 0.2rem;
+}
+
+/* Login / profile. */
+.login-panel {
+  width: min(360px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.profile-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-width: 420px;
+}
+
+.file-label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #eef2f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+  flex: none;
+}
+
+.avatar-small {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.avatar-large {
+  width: 4.5rem;
+  height: 4.5rem;
+  font-size: 1.4rem;
+}
+
+.avatar-fallback {
+  font-weight: 600;
+}
+
+/* Lobby. */
+.lobby-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1rem;
+}
+
+.lobby-grid .chat {
+  grid-column: 1 / -1;
+}
+
+.table-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.table-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  flex-wrap: wrap;
+}
+
+/* Settings. */
+.settings-form {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.settings-form legend {
+  font-size: 0.8rem;
+  color: var(--muted);
+  padding: 0 0.3rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.settings-group {
+  border-top: 1px dashed var(--border);
+  margin-top: 0.3rem;
+  padding-top: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.group-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* Table. */
+.table-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.table-grid .game-view {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.table-grid .chat {
+  grid-column: 1 / -1;
+}
+
+.game-view .status-panel,
+.game-view .hand-view,
+.game-view .trick-view,
+.game-view .scoreboard {
+  grid-column: 1 / -1;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.seat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fbfcfe;
+  min-height: 3rem;
+}
+
+.seat-self {
+  border-color: var(--accent);
+}
+
+.seat-empty {
+  background: #f7f8fa;
+}
+
+.seat-number {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.seat-name {
+  flex: 1;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.avatar-empty {
+  font-weight: 600;
+}
+
+/* Status. */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.status-grid dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.status-grid dd {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.result-line {
+  margin: 0.6rem 0 0;
+  font-weight: 600;
+}
+
+.event-log {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0 0;
+  border-top: 1px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.delta-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+/* Cards: text cards in a bordered square. */
+.card {
+  width: 3.1rem;
+  height: 4.3rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.card-rank {
+  font-size: 1.15rem;
+}
+
+.card-suit {
+  font-size: 1.35rem;
+}
+
+.card-black {
+  color: var(--black);
+}
+
+.card-red {
+  color: var(--red);
+}
+
+.card-playable {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.25);
+}
+
+.card-playable:hover {
+  background: #eef4ff;
+}
+
+.card-selected {
+  background: #fff6d8;
+  border-color: #d9a900;
+}
+
+.card-disabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.trick-row {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.trick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.trick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.trick-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  padding-top: 0.4rem;
+}
+
+.trick-cards {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.trick-cards .card {
+  width: 2.1rem;
+  height: 2.9rem;
+}
+
+.trick-cards .card .card-rank {
+  font-size: 0.85rem;
+}
+
+.trick-cards .card .card-suit {
+  font-size: 0.95rem;
+}
+
+.trick-meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Scores. */
+.score-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.score-table th,
+.score-table td {
+  text-align: left;
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.score-table th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.score-table .self-row {
+  background: #eef4ff;
+}
+
+.score-value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.score-player {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Chat. */
+.chat-list {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0.4rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-item {
+  font-size: 0.87rem;
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.chat-author {
+  font-weight: 600;
+}
+
+.chat-text {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.chat-form input {
+  flex: 1;
+}
+
+@media (max-width: 860px) {
+  .lobby-grid,
+  .table-grid,
+  .table-grid .game-view {
+    grid-template-columns: 1fr;
+  }
+}

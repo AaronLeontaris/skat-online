@@ -1,5 +1,5 @@
 import type { Card, GameDeclaration, Suit } from "./types";
-import { JACK_ORDER } from "./cards";
+import { JACK_ORDER, SUIT_GAME_ORDER } from "./cards";
 
 export const SUIT_BASE: Record<Suit, number> = {
   diamonds: 9,
@@ -15,25 +15,29 @@ export interface Matadors {
 }
 
 /**
- * Count consecutive top jacks "mit" (with) or "ohne" (without) from the Clubs Jack.
- * Only meaningful for suit/Grand games; for Null callers should ignore the result.
+ * Count consecutive top trumps "mit" (with) or "ohne" (without), starting from the Clubs Jack.
+ * Grand: jacks only (max 4). Suit game: jacks then the trump suit A,10,K,Q,9,8,7 (max 11).
+ * `suit` is required when `kind === "suit"`.
  */
-export function computeMatadors(hand: readonly Card[], kind: "suit" | "grand"): Matadors {
-  void kind;
-  const has = (suit: Suit) => hand.some((c) => c.rank === "J" && c.suit === suit);
+export function computeMatadors(hand: readonly Card[], kind: "suit" | "grand", suit?: Suit): Matadors {
+  const sequence: Card[] = JACK_ORDER.map((s) => ({ suit: s, rank: "J" }));
+  if (kind === "suit") {
+    for (const rank of SUIT_GAME_ORDER) sequence.push({ suit: suit!, rank });
+  }
+  const has = (card: Card) => hand.some((c) => c.suit === card.suit && c.rank === card.rank);
 
-  if (has("clubs")) {
+  if (has({ suit: "clubs", rank: "J" })) {
     let count = 0;
-    for (const suit of JACK_ORDER) {
-      if (has(suit)) count++;
+    for (const card of sequence) {
+      if (has(card)) count++;
       else break;
     }
     return { mit: true, count };
   }
 
   let count = 0;
-  for (const suit of JACK_ORDER) {
-    if (!has(suit)) count++;
+  for (const card of sequence) {
+    if (!has(card)) count++;
     else break;
   }
   return { mit: false, count };
