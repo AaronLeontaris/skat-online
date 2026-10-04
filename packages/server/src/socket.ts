@@ -2,6 +2,7 @@ import type { Server, Socket } from "socket.io";
 import { clientPayloadSchemas } from "@skat/shared";
 import { getUserById, verifyToken } from "./auth";
 import { sendChat } from "./chat";
+import { clearPresence, setPresence } from "./redis";
 import {
   applyAnnounce,
   applyBid,
@@ -50,6 +51,10 @@ export function setupSocket(io: Server, store: TableStore): void {
   io.on("connection", (socket) => {
     const userId = socket.data.userId as string;
     socket.join(`user:${userId}`);
+    void setPresence(userId);
+    socket.on("disconnect", () => {
+      void clearPresence(userId);
+    });
 
     const seated = store.tableOfUser(userId);
     if (seated) {

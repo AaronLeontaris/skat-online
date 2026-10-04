@@ -6,6 +6,7 @@ import { authRouter, initUsers } from "./auth";
 import { config } from "./config";
 import { initDb } from "./db";
 import { mediaRouter } from "./media";
+import { initRedis } from "./redis";
 import { buildTablePublic } from "./snapshot";
 import { setupSocket } from "./socket";
 import { TableStore } from "./tables";
@@ -13,6 +14,7 @@ import { TableStore } from "./tables";
 async function main(): Promise<void> {
   await initDb();
   await initUsers();
+  await initRedis();
 
   const store = new TableStore();
 
