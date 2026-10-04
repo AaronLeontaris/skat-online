@@ -1,0 +1,18 @@
+{
+  "name": "skat-online",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "typecheck": "pnpm -r run typecheck",
+    "dev:server": "pnpm --filter @skat/server run dev",
+    "dev:client": "pnpm --filter @skat/client run dev"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
