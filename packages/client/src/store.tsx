@@ -125,14 +125,15 @@ export function SessionProvider({ children }: { children: ReactNode }): JSX.Elem
     }
     // The mapped type keeps event/payload pairs aligned; the cast only erases
     // the generic correlation TypeScript cannot carry through `Socket.emit`.
-    const send = socket.emit as unknown as (ev: string, data: unknown) => void;
+    // `.bind(socket)` is required: socket.io-client's emit uses `this`.
+    const send = socket.emit.bind(socket) as unknown as (ev: string, data: unknown) => void;
     send(event, payload);
   }, []);
 
   const on = useCallback<SessionContextValue["on"]>((event, handler) => {
     const socket = socketRef.current;
     if (!socket) return;
-    const listen = socket.on as unknown as (ev: string, fn: (data: unknown) => void) => void;
+    const listen = socket.on.bind(socket) as unknown as (ev: string, fn: (data: unknown) => void) => void;
     listen(event, handler as (data: unknown) => void);
   }, []);
 
