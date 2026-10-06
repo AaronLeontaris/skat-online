@@ -29,6 +29,15 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
     .filter((seat): seat is PublicPlayer => seat !== null)
     .every((seat) => seat.ready);
   const canStart = host && seated >= 3 && everyoneReady && table.status !== "playing";
+  const startHint = !host
+    ? "nur der Host startet"
+    : seated < 3
+      ? "mindestens 3 Spieler nötig"
+      : !everyoneReady
+        ? "nicht alle bereit"
+        : table.status === "playing"
+          ? "läuft bereits"
+          : "";
   const me = self.seatIndex !== null ? seats[self.seatIndex] ?? null : null;
   const [settingsDraft, setSettingsDraft] = useState<TableSettings>(table.settings);
   const editable = host && table.status !== "playing" && (round === null || round.phase === "waiting");
@@ -108,20 +117,17 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
                 {me?.ready ? "Nicht bereit" : "Bereit"}
               </button>
             )}
-            {host ? (
-              <button
-                type="button"
-                className="primary"
-                disabled={!connected || !canStart}
-                title={!canStart ? "3–4 Spieler, alle bereit" : undefined}
-                onClick={() => emit("table:start", {})}
-              >
-                Spiel starten
-              </button>
-            ) : null}
+            <button
+              type="button"
+              className="primary"
+              disabled={!connected || !canStart}
+              title={!canStart ? startHint : undefined}
+              onClick={() => emit("table:start", {})}
+            >
+              Spiel starten
+            </button>
             <span className="muted small">
-              {seated}/4 Plätzen belegt
-              {!everyoneReady && seated >= 3 ? " · nicht alle bereit" : ""}
+              {seated}/4 Plätzen belegt{startHint ? ` · ${startHint}` : ""}
             </span>
           </div>
         </section>
