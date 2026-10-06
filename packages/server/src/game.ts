@@ -409,6 +409,11 @@ export function scoreRound(table: TableSession, round: RoundState): RoundResult 
   round.phase = "roundEnd";
   table.status = "waiting";
 
+  // Everyone is implicitly ready again for the next round.
+  for (const seat of table.seats) {
+    if (seat) seat.ready = true;
+  }
+
   // Bock trigger for the NEXT round.
   const trigger = round.isRamsch || (round.declaration?.hand === true && result.won === false);
   if (table.settings.bock && trigger) table.activeBocks += 1;

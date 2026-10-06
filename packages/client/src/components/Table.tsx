@@ -105,7 +105,7 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
         <button
           type="button"
           className="primary"
-          disabled={!connected || !canStart}
+          disabled={!connected}
           title={!canStart ? startHint : undefined}
           onClick={() => emit("table:start", {})}
         >
