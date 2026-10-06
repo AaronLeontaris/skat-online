@@ -3,7 +3,9 @@ import type { PublicPlayer, Snapshot, TableSettings } from "@skat/shared";
 import { useSession } from "../store";
 import { Avatar } from "./Avatar";
 import { Chat } from "./Chat";
+import { GameHeader } from "./GameHeader";
 import { GameView } from "./GameView";
+import { Scoreboard } from "./Scoreboard";
 import { SettingsForm } from "./SettingsForm";
 
 const SEAT_INDICES = [0, 1, 2, 3] as const;
@@ -130,32 +132,19 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
   );
 
   return (
-    <div className="screen">
-      <header className="topbar">
-        <h1>{table.name}</h1>
-        <div className="topbar-right">
-          <span className={connected ? "badge" : "badge badge-muted"}>
-            {connected ? "verbunden" : "offline"}
-          </span>
-          <span className="muted">{user?.username ?? ""}</span>
-          <button type="button" onClick={onOpenProfile}>
-            Profil
-          </button>
-          <button type="button" onClick={() => emit("table:leave", {})}>
-            Verlassen
-          </button>
-        </div>
-      </header>
+    <div className={active ? "screen screen-game" : "screen"}>
+      <GameHeader
+        snapshot={snapshot}
+        connected={connected}
+        onOpenProfile={onOpenProfile}
+        onLeave={() => emit("table:leave", {})}
+      />
 
       {active ? (
         <>
-          <div className="game-layout">
-            <div className="game-left">
-              <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
-            </div>
-            <aside className="chat-side">
-              <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
-            </aside>
+          <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
+          <div className="chat-footer">
+            <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
           </div>
           <details className="panel details-panel">
             <summary>Plätze &amp; Einstellungen</summary>
@@ -170,7 +159,16 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           {seatsPanel}
           {settingsPanel}
           {round ? (
-            <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
+            <section className="panel">
+              <h2>Rundenergebnis</h2>
+              {round.lastResult ? (
+                <p className="result-line">
+                  {round.lastResult.won === true ? "Gewonnen" : round.lastResult.won === false ? "Verloren" : "Ramsch"}:{" "}
+                  {round.lastResult.summary} (Spielwert {round.lastResult.gameValue})
+                </p>
+              ) : null}
+              <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+            </section>
           ) : (
             <section className="panel">
               <h2>Warteraum</h2>

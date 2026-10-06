@@ -1,20 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { Card, GameDeclaration, GameKind, Suit } from "@skat/engine";
 import { SUIT_SYMBOL, nextBidValue, sortHand } from "@skat/engine";
 import type {
   ClientToServer,
-  GameEvent,
   PublicPlayer,
   RoundPublicState,
   Snapshot,
 } from "@skat/shared";
-import { CardView, cardKey, cardLabel, sameCard } from "./CardView";
+import { CardView, cardKey, sameCard } from "./CardView";
 import { HandView } from "./HandView";
 import { Scoreboard } from "./Scoreboard";
 import { TrickView } from "./TrickView";
-import { phaseLabel, cardList } from "./labels";
-import { sidePoints } from "./gameHelpers";
-import { useSession } from "../store";
+import { cardList } from "./labels";
+import { declarationLabel, remainingCards, seatLabel } from "./gameHelpers";
 
 export type Emit = <K extends keyof ClientToServer>(event: K, payload: ClientToServer[K]) => void;
 
@@ -24,12 +22,6 @@ export interface GameViewProps {
   /** Live connection state; actions are disabled while offline. */
   connected: boolean;
   emit: Emit;
-}
-
-function seatLabel(seats: readonly (PublicPlayer | null)[], seatIndex: number | null): string {
-  if (seatIndex === null) return "–";
-  const player = seats[seatIndex];
-  return player ? player.username : `Platz ${seatIndex + 1}`;
 }
 
 interface DeclarationDraft {
@@ -53,198 +45,96 @@ function toDeclaration(draft: DeclarationDraft): GameDeclaration {
   return declaration;
 }
 
-function declarationLabel(declaration: GameDeclaration | null): string {
-  if (!declaration) return "–";
-  const base =
-    declaration.kind === "suit" && declaration.suit
-      ? `${SUIT_SYMBOL[declaration.suit]} ${declaration.suit === "clubs" ? "Kreuz" : declaration.suit === "spades" ? "Pik" : declaration.suit === "hearts" ? "Herz" : "Karo"}`
-      : declaration.kind === "grand"
-        ? "Grand"
-        : "Null";
-  const parts = [base];
-  if (declaration.hand) parts.push("Hand");
-  if (declaration.ouvert) parts.push("Ouvert");
-  if (declaration.schneiderAngesagt) parts.push("Schneider angesagt");
-  if (declaration.schwarzAngesagt) parts.push("Schwarz angesagt");
-  return parts.join(" · ");
+/** The whole round area: opponents left/right, the current trick centered, controls, scores, own hand. */
+/** One opponent at the side of the table, showing only their card count. */
+function Opponent({
+  name,
+  cardCount,
+  active,
+}: {
+  name: string;
+  cardCount: number;
+  active: boolean;
+}): JSX.Element {
+  return (
+    <div className={`opponent${active ? " opponent-active" : ""}`}>
+      <span className="opponent-name">{name}</span>
+      <div className="card-backs">
+        {Array.from({ length: cardCount }, (_, i) => (
+          <span key={i} className="card-back" aria-hidden="true" />
+        ))}
+      </div>
+      <span className="muted small">{cardCount} Karten</span>
+    </div>
+  );
 }
 
-/** Human-readable line for a server game event (used by the small event log). */
-function describeEvent(event: GameEvent, seats: readonly (PublicPlayer | null)[]): string {
-  const name = (seat: number): string => seatLabel(seats, seat);
-  switch (event.type) {
-    case "deal":
-      return `Gegeben – ${event.activeSeats.map((seat) => name(seat)).join(", ")}, Geber ${name(event.dealerSeat)}`;
-    case "biddingStarted":
-      return "Reizen begonnen";
-    case "bidMade":
-      return event.value === "pass" ? `${name(event.seatIndex)} passt` : `${name(event.seatIndex)} bietet ${event.value}`;
-    case "declarerChosen":
-      return `${name(event.seatIndex)} spielt (Reizwert ${event.bidValue})`;
-    case "allPassed":
-      return "Alle passen";
-    case "skatPickedUp":
-      return `${name(event.seatIndex)} nimmt den Skat auf`;
-    case "handChosen":
-      return `${name(event.seatIndex)} spielt Hand`;
-    case "announced":
-      return `${name(event.seatIndex)} sagt an: ${declarationLabel(event.declaration)}`;
-    case "cardPlayed":
-      return `${name(event.seatIndex)} spielt ${cardLabel(event.card)}`;
-    case "trickWon":
-      return `Stich an ${name(event.winnerSeat)} (${event.points} Punkte)`;
-    case "kontra":
-      return `${name(event.seatIndex)} sagt Kontra`;
-    case "re":
-      return `${name(event.seatIndex)} sagt Re`;
-    case "roundEnd":
-      return `Runde beendet: ${event.result.summary}`;
-    default:
-      return "";
-  }
-}
-
-const MAX_LOG = 8;
-
-/** The whole round area: status, own hand, trick, controls and scores. */
 export function GameView({ snapshot, round, connected, emit }: GameViewProps): JSX.Element {
   const { self, table } = snapshot;
   const seats = table.seats;
-  const { on } = useSession();
-  const [log, setLog] = useState<string[]>([]);
-  const seatsRef = useRef(seats);
-  seatsRef.current = seats;
 
-  // The event log is cosmetic: every piece of state above comes from snapshots.
-  useEffect(() => {
-    on("game:event", ({ event }) => {
-      const line = describeEvent(event, seatsRef.current);
-      if (!line) return;
-      setLog((current) => [...current, line].slice(-MAX_LOG));
-    });
-  }, [on]);
-
-  useEffect(() => {
-    setLog([]);
-  }, [round.roundNumber]);
-
-  const myTurn = self.seatIndex !== null && round.currentSeat === self.seatIndex;
   const canAct = connected;
-  const points = sidePoints(round, round.declarerSeat);
   const isDeclarer = self.seatIndex !== null && round.declarerSeat === self.seatIndex;
   const tricksPlayed = round.completedTricks.length;
 
+  const opponents =
+    self.seatIndex !== null ? round.activeSeats.filter((s) => s !== self.seatIndex) : round.activeSeats;
+
   return (
     <div className="game-view">
-      <section className="panel stats-bar">
-        <dl className="status-grid">
-          <div>
-            <dt>Runde</dt>
-            <dd>
-              {round.roundNumber} · {phaseLabel(round.phase)}
-            </dd>
-          </div>
-          <div>
-            <dt>Geber</dt>
-            <dd>{seatLabel(seats, round.dealerSeat)}</dd>
-          </div>
-          <div>
-            <dt>Alleinspieler</dt>
-            <dd>{round.declarerSeat === null ? "–" : seatLabel(seats, round.declarerSeat)}</dd>
-          </div>
-          <div>
-            <dt>Ansage</dt>
-            <dd>{declarationLabel(round.declaration)}</dd>
-          </div>
-          <div>
-            <dt>Reizwert</dt>
-            <dd>{round.bidValue ?? "–"}</dd>
-          </div>
-          <div>
-            <dt>Am Zug</dt>
-            <dd>
-              {round.currentSeat === null ? "–" : seatLabel(seats, round.currentSeat)}
-              {myTurn ? " (Du)" : ""}
-            </dd>
-          </div>
-          {round.bockActive ? (
-            <div>
-              <dt>Bock</dt>
-              <dd>aktiv</dd>
-            </div>
+      <div className="game-table">
+        <div className="opponents opponents-left">
+          {opponents.length > 0 ? (
+            <Opponent
+              name={seatLabel(seats, opponents[0])}
+              cardCount={remainingCards(round, opponents[0])}
+              active={round.currentSeat === opponents[0]}
+            />
           ) : null}
-          {round.kontra || round.re ? (
-            <div>
-              <dt>Kontra/Re</dt>
-              <dd>
-                {round.kontra ? "Kontra" : ""}
-                {round.re ? " · Re" : ""}
-              </dd>
-            </div>
+        </div>
+
+        <div className="game-center">
+          <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
+
+          <Controls
+            round={round}
+            selfSeat={self.seatIndex}
+            hand={self.hand}
+            seats={seats}
+            disabled={!canAct}
+            emit={emit}
+          />
+
+          {round.phase === "playing" && table.settings.kontraRe ? (
+            <section className="panel">
+              <h3>Kontra/Re</h3>
+              {!round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0 ? (
+                <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
+                  Kontra
+                </button>
+              ) : null}
+              {round.kontra && !round.re && isDeclarer && tricksPlayed === 0 ? (
+                <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
+                  Re
+                </button>
+              ) : null}
+              {tricksPlayed > 0 ? <p className="muted small">Nicht mehr möglich.</p> : null}
+              {!isDeclarer && round.kontra ? <p className="muted small">Kontra liegt bereits.</p> : null}
+            </section>
           ) : null}
-          <div>
-            <dt>Augen</dt>
-            <dd>
-              {points.declarer === null ? "–" : `${points.declarer} : ${points.defenders ?? 0}`}
-            </dd>
-          </div>
-        </dl>
-        {round.bidding ? (
-          <p className="muted small">
-            Bieten: {seatLabel(seats, round.bidding.sayerSeat)} sagt gegen{" "}
-            {seatLabel(seats, round.bidding.listenerSeat)} · gehalten: {round.bidding.heldValue ?? "–"}
-            {round.bidding.pendingRaise !== null ? ` · Gebot: ${round.bidding.pendingRaise}` : ""}
-          </p>
-        ) : null}
-        {round.lastResult ? (
-          <p className="result-line">
-            {round.lastResult.won === true ? "Gewonnen" : round.lastResult.won === false ? "Verloren" : "Ramsch"}:{" "}
-            {round.lastResult.summary} (Spielwert {round.lastResult.gameValue})
-          </p>
-        ) : null}
-        {!connected ? <p className="error-text">Verbindung unterbrochen – Neuverbindung läuft…</p> : null}
-        {log.length > 0 ? (
-          <ul className="event-log">
-            {log.map((line, index) => (
-              <li key={`${index}-${line}`} className="muted small">
-                {line}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
 
-      <div className="game-main">
-        <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
+          <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+        </div>
 
-        <Controls
-          round={round}
-          selfSeat={self.seatIndex}
-          hand={self.hand}
-          seats={seats}
-          disabled={!canAct}
-          emit={emit}
-        />
-
-        {round.phase === "playing" && table.settings.kontraRe ? (
-          <section className="panel">
-            <h3>Kontra/Re</h3>
-            {!round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0 ? (
-              <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
-                Kontra
-              </button>
-            ) : null}
-            {round.kontra && !round.re && isDeclarer && tricksPlayed === 0 ? (
-              <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
-                Re
-              </button>
-            ) : null}
-            {tricksPlayed > 0 ? <p className="muted small">Nicht mehr möglich.</p> : null}
-            {!isDeclarer && round.kontra ? <p className="muted small">Kontra liegt bereits.</p> : null}
-          </section>
-        ) : null}
-
-        <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+        <div className="opponents opponents-right">
+          {opponents.length > 1 ? (
+            <Opponent
+              name={seatLabel(seats, opponents[1])}
+              cardCount={remainingCards(round, opponents[1])}
+              active={round.currentSeat === opponents[1]}
+            />
+          ) : null}
+        </div>
       </div>
 
       {self.seatIndex !== null && self.hand.length > 0 ? (

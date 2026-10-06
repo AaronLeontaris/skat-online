@@ -1,4 +1,48 @@
-import type { RoundPublicState } from "@skat/shared";
+import { SUIT_SYMBOL } from "@skat/engine";
+import type { GameDeclaration } from "@skat/engine";
+import type { PublicPlayer, RoundPublicState } from "@skat/shared";
+
+/** Player name for a seat, or "Platz N" when empty. */
+export function seatLabel(seats: readonly (PublicPlayer | null)[], seatIndex: number | null): string {
+  if (seatIndex === null) return "–";
+  const player = seats[seatIndex];
+  return player ? player.username : `Platz ${seatIndex + 1}`;
+}
+
+/** Human-readable game declaration, e.g. "♠ Pik · Hand". */
+export function declarationLabel(declaration: GameDeclaration | null): string {
+  if (!declaration) return "–";
+  const base =
+    declaration.kind === "suit" && declaration.suit
+      ? `${SUIT_SYMBOL[declaration.suit]} ${
+          declaration.suit === "clubs"
+            ? "Kreuz"
+            : declaration.suit === "spades"
+              ? "Pik"
+              : declaration.suit === "hearts"
+                ? "Herz"
+                : "Karo"
+        }`
+      : declaration.kind === "grand"
+        ? "Grand"
+        : "Null";
+  const parts = [base];
+  if (declaration.hand) parts.push("Hand");
+  if (declaration.ouvert) parts.push("Ouvert");
+  if (declaration.schneiderAngesagt) parts.push("Schneider angesagt");
+  if (declaration.schwarzAngesagt) parts.push("Schwarz angesagt");
+  return parts.join(" · ");
+}
+
+/**
+ * Remaining (unplayed) card count for a seat, derived purely from public trick
+ * state — the client never receives opponents' card values, only their count.
+ */
+export function remainingCards(round: RoundPublicState, seatIndex: number): number {
+  let played = round.completedTricks.length;
+  if (round.currentTrick.some((p) => p.seatIndex === seatIndex)) played += 1;
+  return Math.max(0, 10 - played);
+}
 
 /**
  * A readable score line for a player. The server may add a `score`/`points`
