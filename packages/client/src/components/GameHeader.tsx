@@ -80,15 +80,19 @@ export function GameHeader({ snapshot, connected, onOpenProfile, onLeave }: Game
               <div>
                 <dt>Kontra/Re</dt>
                 <dd>
-                  {round.kontra ? "Kontra" : ""}
-                  {round.re ? " · Re" : ""}
+                  <span className="warning-badge">
+                    {round.kontra ? "Kontra" : ""}
+                    {round.re ? " · Re" : ""}
+                  </span>
                 </dd>
               </div>
             ) : null}
-            <div>
-              <dt>Augen</dt>
-              <dd>{points.declarer === null ? "–" : `${points.declarer} : ${points.defenders ?? 0}`}</dd>
-            </div>
+            {round.lastResult !== null ? (
+              <div>
+                <dt>Augen</dt>
+                <dd>{points.declarer === null ? "–" : `${points.declarer} : ${points.defenders ?? 0}`}</dd>
+              </div>
+            ) : null}
           </dl>
           {round.bidding ? (
             <p className="muted small">

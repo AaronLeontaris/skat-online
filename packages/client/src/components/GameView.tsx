@@ -7,6 +7,7 @@ import type {
   RoundPublicState,
   Snapshot,
 } from "@skat/shared";
+import { Avatar } from "./Avatar";
 import { CardView, cardKey, sameCard } from "./CardView";
 import { HandView } from "./HandView";
 import { Scoreboard } from "./Scoreboard";
@@ -49,15 +50,21 @@ function toDeclaration(draft: DeclarationDraft): GameDeclaration {
 /** One opponent at the side of the table, showing only their card count. */
 function Opponent({
   name,
+  avatarUrl,
   cardCount,
   active,
 }: {
   name: string;
+  avatarUrl: string | null;
   cardCount: number;
   active: boolean;
 }): JSX.Element {
   return (
     <div className={`opponent${active ? " opponent-active" : ""}`}>
+      <div className="opponent-avatar">
+        <Avatar username={name} avatarUrl={avatarUrl} size="small" />
+        {active ? <span className="turn-dot" aria-label="am Zug" /> : null}
+      </div>
       <span className="opponent-name">{name}</span>
       <div className="card-backs">
         {Array.from({ length: cardCount }, (_, i) => (
@@ -87,6 +94,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
           {opponents.length > 0 ? (
             <Opponent
               name={seatLabel(seats, opponents[0])}
+              avatarUrl={seats[opponents[0]]?.avatarUrl ?? null}
               cardCount={remainingCards(round, opponents[0])}
               active={round.currentSeat === opponents[0]}
             />
@@ -105,31 +113,40 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             emit={emit}
           />
 
-          {round.phase === "playing" && table.settings.kontraRe ? (
-            <section className="panel">
-              <h3>Kontra/Re</h3>
-              {!round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0 ? (
-                <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
-                  Kontra
-                </button>
-              ) : null}
-              {round.kontra && !round.re && isDeclarer && tricksPlayed === 0 ? (
-                <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
-                  Re
-                </button>
-              ) : null}
-              {tricksPlayed > 0 ? <p className="muted small">Nicht mehr möglich.</p> : null}
-              {!isDeclarer && round.kontra ? <p className="muted small">Kontra liegt bereits.</p> : null}
-            </section>
-          ) : null}
+          {round.phase === "playing" && table.settings.kontraRe
+            ? (() => {
+                const canKontra = !round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0;
+                const canRe = round.kontra && !round.re && isDeclarer && tricksPlayed === 0;
+                if (!canKontra && !canRe) return null;
+                return (
+                  <section className="panel">
+                    <h3>Kontra/Re</h3>
+                    {canKontra ? (
+                      <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
+                        Kontra
+                      </button>
+                    ) : null}
+                    {canRe ? (
+                      <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
+                        Re
+                      </button>
+                    ) : null}
+                  </section>
+                );
+              })()
+            : null}
 
-          <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+          <details className="panel">
+            <summary>Punkte</summary>
+            <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+          </details>
         </div>
 
         <div className="opponents opponents-right">
           {opponents.length > 1 ? (
             <Opponent
               name={seatLabel(seats, opponents[1])}
+              avatarUrl={seats[opponents[1]]?.avatarUrl ?? null}
               cardCount={remainingCards(round, opponents[1])}
               active={round.currentSeat === opponents[1]}
             />

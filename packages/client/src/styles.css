@@ -451,6 +451,42 @@ label {
   background: repeating-linear-gradient(45deg, #1b6b50, #1b6b50 2px, #14624a 2px, #14624a 4px);
 }
 
+.warning-badge {
+  display: inline-block;
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 700;
+  background: #fdecea;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+
+.opponent-avatar {
+  position: relative;
+}
+
+.turn-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
 .chat-footer {
   position: fixed;
   bottom: 1rem;
@@ -481,6 +517,12 @@ label {
   cursor: pointer;
   font-weight: 600;
   padding: 0.25rem 0;
+}
+
+details.panel summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
 .details-panel .table-grid {

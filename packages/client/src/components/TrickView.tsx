@@ -44,8 +44,7 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
             ))}
           </span>
           <span className="trick-meta">
-            Gewinner: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {last.points} Punkte ·{" "}
-            {completedTricks.length} Stiche gespielt
+            Gewinner: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length} Stiche gespielt
           </span>
         </div>
       )}
