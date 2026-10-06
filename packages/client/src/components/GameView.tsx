@@ -136,11 +136,14 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
 
   return (
     <div className="game-view">
-      <section className="panel status-panel">
-        <h2>
-          Runde {round.roundNumber} · {phaseLabel(round.phase)}
-        </h2>
+      <section className="panel stats-bar">
         <dl className="status-grid">
+          <div>
+            <dt>Runde</dt>
+            <dd>
+              {round.roundNumber} · {phaseLabel(round.phase)}
+            </dd>
+          </div>
           <div>
             <dt>Geber</dt>
             <dd>{seatLabel(seats, round.dealerSeat)}</dd>
@@ -148,10 +151,6 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
           <div>
             <dt>Alleinspieler</dt>
             <dd>{round.declarerSeat === null ? "–" : seatLabel(seats, round.declarerSeat)}</dd>
-          </div>
-          <div>
-            <dt>Trumpf</dt>
-            <dd>{round.trumpSuit ? `${SUIT_SYMBOL[round.trumpSuit]} ${round.trumpSuit}` : "–"}</dd>
           </div>
           <div>
             <dt>Ansage</dt>
@@ -165,7 +164,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             <dt>Am Zug</dt>
             <dd>
               {round.currentSeat === null ? "–" : seatLabel(seats, round.currentSeat)}
-              {myTurn ? " (Du bist dran)" : ""}
+              {myTurn ? " (Du)" : ""}
             </dd>
           </div>
           {round.bockActive ? (
@@ -215,43 +214,49 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
         ) : null}
       </section>
 
-      <HandView
-        hand={self.hand}
-        legalPlays={self.legalPlays}
-        ownerName={seatLabel(seats, self.seatIndex)}
-        onPlay={(card) => emit("game:playCard", { card })}
-      />
+      <div className="game-main">
+        <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
 
-      <Controls
-        round={round}
-        selfSeat={self.seatIndex}
-        hand={self.hand}
-        seats={seats}
-        disabled={!canAct}
-        emit={emit}
-      />
+        <Controls
+          round={round}
+          selfSeat={self.seatIndex}
+          hand={self.hand}
+          seats={seats}
+          disabled={!canAct}
+          emit={emit}
+        />
 
-      <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
+        {round.phase === "playing" && table.settings.kontraRe ? (
+          <section className="panel">
+            <h3>Kontra/Re</h3>
+            {!round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0 ? (
+              <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
+                Kontra
+              </button>
+            ) : null}
+            {round.kontra && !round.re && isDeclarer && tricksPlayed === 0 ? (
+              <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
+                Re
+              </button>
+            ) : null}
+            {tricksPlayed > 0 ? <p className="muted small">Nicht mehr möglich.</p> : null}
+            {!isDeclarer && round.kontra ? <p className="muted small">Kontra liegt bereits.</p> : null}
+          </section>
+        ) : null}
 
-      {round.phase === "playing" && table.settings.kontraRe ? (
-        <section className="panel">
-          <h3>Kontra/Re</h3>
-          {!round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0 ? (
-            <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
-              Kontra
-            </button>
-          ) : null}
-          {round.kontra && !round.re && isDeclarer && tricksPlayed === 0 ? (
-            <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
-              Re
-            </button>
-          ) : null}
-          {tricksPlayed > 0 ? <p className="muted small">Nicht mehr möglich.</p> : null}
-          {!isDeclarer && round.kontra ? <p className="muted small">Kontra liegt bereits.</p> : null}
-        </section>
+        <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+      </div>
+
+      {self.seatIndex !== null && self.hand.length > 0 ? (
+        <div className="hand-footer">
+          <HandView
+            hand={self.hand}
+            legalPlays={self.legalPlays}
+            ownerName={seatLabel(seats, self.seatIndex)}
+            onPlay={(card) => emit("game:playCard", { card })}
+          />
+        </div>
       ) : null}
-
-      <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
     </div>
   );
 }

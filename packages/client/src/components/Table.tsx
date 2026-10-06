@@ -5,9 +5,9 @@ import { Avatar } from "./Avatar";
 import { Chat } from "./Chat";
 import { GameView } from "./GameView";
 import { SettingsForm } from "./SettingsForm";
-import { phaseLabel } from "./labels";
 
 const SEAT_INDICES = [0, 1, 2, 3] as const;
+const ACTIVE_PHASES: readonly string[] = ["bidding", "skat", "announce", "playing", "scoring"];
 
 export interface TableProps {
   snapshot: Snapshot;
@@ -40,7 +40,8 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           : "";
   const me = self.seatIndex !== null ? seats[self.seatIndex] ?? null : null;
   const [settingsDraft, setSettingsDraft] = useState<TableSettings>(table.settings);
-  const editable = host && table.status !== "playing" && (round === null || round.phase === "waiting");
+  const editable = host && table.status !== "playing";
+  const active = round !== null && ACTIVE_PHASES.includes(round.phase);
 
   useEffect(() => {
     setSettingsDraft(table.settings);
@@ -50,6 +51,83 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
     setSettingsDraft(next);
     emit("table:setSettings", { settings: next });
   }
+
+  const seatsPanel = (
+    <section className="panel seats-panel">
+      <h2>Plätze</h2>
+      <div className="seat-grid">
+        {SEAT_INDICES.map((seatIndex) => {
+          const player = seats[seatIndex] ?? null;
+          const isSelf = self.seatIndex === seatIndex;
+          return (
+            <div key={seatIndex} className={`seat${isSelf ? " seat-self" : ""}${player ? "" : " seat-empty"}`}>
+              <span className="seat-number">Platz {seatIndex + 1}</span>
+              {player ? (
+                <>
+                  <Avatar username={player.username} avatarUrl={player.avatarUrl} size="small" />
+                  <span className="seat-name">
+                    {player.username}
+                    {table.hostUserId === player.userId ? " (Host)" : ""}
+                    {isSelf ? " (Du)" : ""}
+                  </span>
+                  <span className={player.ready ? "badge badge-ok" : "badge badge-muted"}>
+                    {player.ready ? "Bereit" : "Nicht bereit"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <div className="avatar avatar-small avatar-empty" aria-hidden="true">
+                    –
+                  </div>
+                  <span className="seat-name muted">Frei</span>
+                </>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="row wrap">
+        {self.seatIndex === null ? (
+          <span className="muted small">Du sitzt nicht an diesem Tisch.</span>
+        ) : (
+          <button
+            type="button"
+            className={me?.ready ? undefined : "primary"}
+            disabled={!connected}
+            onClick={() => emit("table:ready", { ready: !(me?.ready ?? false) })}
+          >
+            {me?.ready ? "Nicht bereit" : "Bereit"}
+          </button>
+        )}
+        <button
+          type="button"
+          className="primary"
+          disabled={!connected || !canStart}
+          title={!canStart ? startHint : undefined}
+          onClick={() => emit("table:start", {})}
+        >
+          Spiel starten
+        </button>
+        <span className="muted small">
+          {seated}/4 Plätzen belegt{startHint ? ` · ${startHint}` : ""}
+        </span>
+      </div>
+    </section>
+  );
+
+  const settingsPanel = (
+    <section className="panel">
+      <h2>Einstellungen</h2>
+      <SettingsForm
+        idPrefix="table"
+        value={settingsDraft}
+        onChange={applySettings}
+        disabled={!editable || !connected}
+      />
+      {!editable ? <p className="muted small">Nur der Host kann vor Rundenbeginn ändern.</p> : null}
+    </section>
+  );
 
   return (
     <div className="screen">
@@ -69,100 +147,46 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
         </div>
       </header>
 
-      <div className="table-grid">
-        <section className="panel seats-panel">
-          <h2>Plätze</h2>
-          <div className="seat-grid">
-            {SEAT_INDICES.map((seatIndex) => {
-              const player = seats[seatIndex] ?? null;
-              const isSelf = self.seatIndex === seatIndex;
-              return (
-                <div key={seatIndex} className={`seat${isSelf ? " seat-self" : ""}${player ? "" : " seat-empty"}`}>
-                  <span className="seat-number">Platz {seatIndex + 1}</span>
-                  {player ? (
-                    <>
-                      <Avatar username={player.username} avatarUrl={player.avatarUrl} size="small" />
-                      <span className="seat-name">
-                        {player.username}
-                        {table.hostUserId === player.userId ? " (Host)" : ""}
-                        {isSelf ? " (Du)" : ""}
-                      </span>
-                      <span className={player.ready ? "badge badge-ok" : "badge badge-muted"}>
-                        {player.ready ? "Bereit" : "Nicht bereit"}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="avatar avatar-small avatar-empty" aria-hidden="true">
-                        –
-                      </div>
-                      <span className="seat-name muted">Frei</span>
-                    </>
-                  )}
-                </div>
-              );
-            })}
+      {active ? (
+        <>
+          <div className="game-layout">
+            <div className="game-left">
+              <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
+            </div>
+            <aside className="chat-side">
+              <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
+            </aside>
           </div>
-
-          <div className="row wrap">
-            {self.seatIndex === null ? (
-              <span className="muted small">Du sitzt nicht an diesem Tisch.</span>
-            ) : (
-              <button
-                type="button"
-                className={me?.ready ? undefined : "primary"}
-                disabled={!connected}
-                onClick={() => emit("table:ready", { ready: !(me?.ready ?? false) })}
-              >
-                {me?.ready ? "Nicht bereit" : "Bereit"}
-              </button>
-            )}
-            <button
-              type="button"
-              className="primary"
-              disabled={!connected || !canStart}
-              title={!canStart ? startHint : undefined}
-              onClick={() => emit("table:start", {})}
-            >
-              Spiel starten
-            </button>
-            <span className="muted small">
-              {seated}/4 Plätzen belegt{startHint ? ` · ${startHint}` : ""}
-            </span>
-          </div>
-        </section>
-
-        <section className="panel">
-          <h2>Einstellungen</h2>
-          <SettingsForm
-            idPrefix="table"
-            value={settingsDraft}
-            onChange={applySettings}
-            disabled={!editable || !connected}
-          />
-          {!editable ? <p className="muted small">Nur der Host kann vor Rundenbeginn ändern.</p> : null}
-        </section>
-
-        {round && round.phase !== "waiting" ? (
-          <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
-        ) : (
-          <section className="panel">
-            <h2>Warteraum</h2>
-            <p className="muted">
-              {round ? `Phase: ${phaseLabel(round.phase)}` : "Noch keine Runde gestartet."}
-            </p>
-            <p className="muted small">
-              {seated < 3
-                ? "Mindestens 3 Spieler nötig."
-                : everyoneReady
-                  ? "Alle bereit – der Host kann starten."
-                  : "Warte auf Bereitschaft aller Spieler."}
-            </p>
-          </section>
-        )}
-
-        <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
-      </div>
+          <details className="panel details-panel">
+            <summary>Plätze &amp; Einstellungen</summary>
+            <div className="table-grid">
+              {seatsPanel}
+              {settingsPanel}
+            </div>
+          </details>
+        </>
+      ) : (
+        <div className="table-grid">
+          {seatsPanel}
+          {settingsPanel}
+          {round ? (
+            <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
+          ) : (
+            <section className="panel">
+              <h2>Warteraum</h2>
+              <p className="muted">Noch keine Runde gestartet.</p>
+              <p className="muted small">
+                {seated < 3
+                  ? "Mindestens 3 Spieler nötig."
+                  : everyoneReady
+                    ? "Alle bereit – der Host kann starten."
+                    : "Warte auf Bereitschaft aller Spieler."}
+              </p>
+            </section>
+          )}
+          <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
+        </div>
+      )}
     </div>
   );
 }

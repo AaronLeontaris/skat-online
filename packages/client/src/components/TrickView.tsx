@@ -10,25 +10,16 @@ export interface TrickViewProps {
   currentTrick: readonly PlayedCard[];
   completedTricks: readonly CompletedTrick[];
   seats: readonly (PublicPlayer | null)[];
-  /** Show every completed trick; otherwise only the last few. */
-  showAll?: boolean;
 }
 
-const COLLAPSED_TRICKS = 3;
-
-/** Current trick plus a compact list of completed tricks with winner and points. */
-export function TrickView({
-  currentTrick,
-  completedTricks,
-  seats,
-  showAll = false,
-}: TrickViewProps): JSX.Element {
-  const visible = showAll ? completedTricks : completedTricks.slice(-COLLAPSED_TRICKS);
-  const hidden = completedTricks.length - visible.length;
+/** The current trick, plus only the most recently completed Stich. */
+export function TrickView({ currentTrick, completedTricks, seats }: TrickViewProps): JSX.Element {
+  const last = completedTricks.length > 0 ? completedTricks[completedTricks.length - 1] : null;
 
   return (
     <section className="panel trick-view">
-      <h2>Stich</h2>
+      <h2>Stich {completedTricks.length + 1}</h2>
+
       <div className="row trick-row">
         {currentTrick.length === 0 ? (
           <p className="muted">Noch keine Karte gespielt.</p>
@@ -42,25 +33,21 @@ export function TrickView({
         )}
       </div>
 
-      <h3>Stiche ({completedTricks.length})</h3>
-      {hidden > 0 ? <p className="muted small">… {hidden} weitere Stiche</p> : null}
-      {completedTricks.length === 0 ? (
-        <p className="muted small">Noch keine abgeschlossenen Stiche.</p>
+      <h3>Letzter Stich</h3>
+      {last === null ? (
+        <p className="muted small">Noch kein Stich abgeschlossen.</p>
       ) : (
-        <ul className="trick-list">
-          {visible.map((trick, index) => (
-            <li key={`${trick.winnerSeat}-${completedTricks.length - visible.length + index}`}>
-              <span className="trick-cards">
-                {trick.cards.map((played) => (
-                  <CardView key={cardKey(played.card)} card={played.card} disabled />
-                ))}
-              </span>
-              <span className="trick-meta">
-                Gewinner: <strong>{seatLabel(seats, trick.winnerSeat)}</strong> · {trick.points} Punkte
-              </span>
-            </li>
-          ))}
-        </ul>
+        <div className="trick-row">
+          <span className="trick-cards">
+            {last.cards.map((played) => (
+              <CardView key={cardKey(played.card)} card={played.card} disabled />
+            ))}
+          </span>
+          <span className="trick-meta">
+            Gewinner: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {last.points} Punkte ·{" "}
+            {completedTricks.length} Stiche gespielt
+          </span>
+        </div>
       )}
     </section>
   );
