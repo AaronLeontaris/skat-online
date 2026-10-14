@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { ChatMessage } from "@skat/shared";
 
 export interface ChatProps {
@@ -20,9 +20,17 @@ export function Chat({ messages, onSend, disabled, collapsible = false }: ChatPr
   const [open, setOpen] = useState(!collapsible);
   const [seenCount, setSeenCount] = useState(0);
   const [text, setText] = useState("");
+  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (open) setSeenCount(messages.length);
+  }, [messages.length, open]);
+
+  // Always scroll to the newest message while the chat is open.
+  useEffect(() => {
+    if (open && listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
   }, [messages.length, open]);
 
   const unread = open ? 0 : Math.max(0, messages.length - seenCount);
@@ -54,7 +62,7 @@ export function Chat({ messages, onSend, disabled, collapsible = false }: ChatPr
           </button>
         ) : null}
       </div>
-      <ul className="chat-list">
+      <ul className="chat-list" ref={listRef}>
         {messages.length === 0 ? (
           <li className="muted small">Noch keine Nachrichten.</li>
         ) : (

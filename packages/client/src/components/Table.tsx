@@ -42,6 +42,9 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           : "";
   const me = self.seatIndex !== null ? seats[self.seatIndex] ?? null : null;
   const [settingsDraft, setSettingsDraft] = useState<TableSettings>(table.settings);
+  const [openSeats, setOpenSeats] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
+  const [openScores, setOpenScores] = useState(false);
   const editable = host && table.status !== "playing";
   const active = round !== null && ACTIVE_PHASES.includes(round.phase);
 
@@ -140,39 +143,40 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
 
       {active ? (
         <>
-          <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
-
-          <div className="game-panels">
-            <details className="panel">
-              <summary>
-                <span className="panel-icon" aria-hidden="true">
-                  👥
-                </span>
-                Plätze
-              </summary>
-              <div className="panel-body">{seatsContent}</div>
-            </details>
-            <details className="panel">
-              <summary>
-                <span className="panel-icon" aria-hidden="true">
-                  ⚙️
-                </span>
-                Einstellungen
-              </summary>
-              <div className="panel-body">{settingsContent}</div>
-            </details>
-            <details className="panel">
-              <summary>
-                <span className="panel-icon" aria-hidden="true">
-                  🏆
-                </span>
-                Punkte
-              </summary>
-              <div className="panel-body">
-                <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
-              </div>
-            </details>
+          <div className="game-toolbar">
+            <span className="round-label">Runde {round.roundNumber}</span>
+            <button
+              type="button"
+              className={openSeats ? "toolbar-btn active" : "toolbar-btn"}
+              onClick={() => setOpenSeats((v) => !v)}
+            >
+              👥 Plätze
+            </button>
+            <button
+              type="button"
+              className={openSettings ? "toolbar-btn active" : "toolbar-btn"}
+              onClick={() => setOpenSettings((v) => !v)}
+            >
+              ⚙️ Einstellungen
+            </button>
+            <button
+              type="button"
+              className={openScores ? "toolbar-btn active" : "toolbar-btn"}
+              onClick={() => setOpenScores((v) => !v)}
+            >
+              🏆 Punkte
+            </button>
           </div>
+
+          {openSeats ? <div className="panel toolbar-panel">{seatsContent}</div> : null}
+          {openSettings ? <div className="panel toolbar-panel">{settingsContent}</div> : null}
+          {openScores ? (
+            <div className="panel toolbar-panel">
+              <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+            </div>
+          ) : null}
+
+          <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
 
           <div className="chat-footer">
             <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} collapsible />
