@@ -11,7 +11,7 @@ export function initials(username: string): string {
 export interface AvatarProps {
   username: string;
   avatarUrl: string | null;
-  size?: "small" | "large";
+  size?: "small" | "medium" | "large";
 }
 
 /** Round avatar image with an initials fallback (no placeholder graphics in v1). */

@@ -61,7 +61,7 @@ function Opponent({
   return (
     <div className={`opponent${active ? " opponent-active" : ""}`}>
       <div className="opponent-avatar">
-        <Avatar username={name} avatarUrl={avatarUrl} size="small" />
+        <Avatar username={name} avatarUrl={avatarUrl} size="medium" />
         {active ? <span className="turn-dot" aria-label="am Zug" /> : null}
       </div>
       <span className="opponent-name">{name}</span>

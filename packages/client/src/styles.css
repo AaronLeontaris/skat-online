@@ -272,6 +272,12 @@ label {
   height: 2.2rem;
 }
 
+.avatar-medium {
+  width: 3.4rem;
+  height: 3.4rem;
+  font-size: 1.2rem;
+}
+
 .avatar-large {
   width: 4.5rem;
   height: 4.5rem;
