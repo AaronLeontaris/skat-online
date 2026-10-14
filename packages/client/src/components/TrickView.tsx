@@ -12,17 +12,15 @@ export interface TrickViewProps {
   seats: readonly (PublicPlayer | null)[];
 }
 
-/** The current trick, plus only the most recently completed Stich. */
+/** The current trick centered on the table, plus the most recent completed Stich. */
 export function TrickView({ currentTrick, completedTricks, seats }: TrickViewProps): JSX.Element {
   const last = completedTricks.length > 0 ? completedTricks[completedTricks.length - 1] : null;
 
   return (
-    <section className="panel trick-view">
-      <h2>Stich {completedTricks.length + 1}</h2>
-
-      <div className="row trick-row">
+    <div className="trick-view">
+      <div className="trick-current">
         {currentTrick.length === 0 ? (
-          <p className="muted">Noch keine Karte gespielt.</p>
+          <span className="muted">Keine Karten im aktuellen Stich.</span>
         ) : (
           currentTrick.map((played) => (
             <div key={cardKey(played.card)} className="trick-card">
@@ -33,21 +31,18 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
         )}
       </div>
 
-      <h3>Letzter Stich</h3>
-      {last === null ? (
-        <p className="muted small">Noch kein Stich abgeschlossen.</p>
-      ) : (
-        <div className="trick-row">
-          <span className="trick-cards">
+      {last !== null ? (
+        <div className="trick-last">
+          <span className="muted small">
+            Letzter Stich: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length} Stiche
+          </span>
+          <div className="trick-cards">
             {last.cards.map((played) => (
               <CardView key={cardKey(played.card)} card={played.card} disabled />
             ))}
-          </span>
-          <span className="trick-meta">
-            Gewinner: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length} Stiche gespielt
-          </span>
+          </div>
         </div>
-      )}
-    </section>
+      ) : null}
+    </div>
   );
 }

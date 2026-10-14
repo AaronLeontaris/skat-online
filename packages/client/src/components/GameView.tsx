@@ -10,7 +10,6 @@ import type {
 import { Avatar } from "./Avatar";
 import { CardView, cardKey, sameCard } from "./CardView";
 import { HandView } from "./HandView";
-import { Scoreboard } from "./Scoreboard";
 import { TrickView } from "./TrickView";
 import { cardList } from "./labels";
 import { declarationLabel, remainingCards, seatLabel } from "./gameHelpers";
@@ -102,7 +101,9 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
         </div>
 
         <div className="game-center">
-          <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
+          <div className="table-surface">
+            <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
+          </div>
 
           <Controls
             round={round}
@@ -135,11 +136,6 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
                 );
               })()
             : null}
-
-          <details className="panel">
-            <summary>Punkte</summary>
-            <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
-          </details>
         </div>
 
         <div className="opponents opponents-right">

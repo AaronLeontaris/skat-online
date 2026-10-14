@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { ChatMessage } from "@skat/shared";
 
 export interface ChatProps {
   messages: ChatMessage[];
   onSend: (text: string) => void;
   disabled?: boolean;
+  /** Collapsible mode (floating launcher + badge); otherwise a normal open panel. */
+  collapsible?: boolean;
 }
 
 function formatTime(iso: string): string {
@@ -13,9 +15,17 @@ function formatTime(iso: string): string {
   return date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Table chat: message list plus an input. Messages come from the store. */
-export function Chat({ messages, onSend, disabled }: ChatProps): JSX.Element {
+/** Table chat: message list plus an input. In collapsible mode it is a floating launcher. */
+export function Chat({ messages, onSend, disabled, collapsible = false }: ChatProps): JSX.Element {
+  const [open, setOpen] = useState(!collapsible);
+  const [seenCount, setSeenCount] = useState(0);
   const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (open) setSeenCount(messages.length);
+  }, [messages.length, open]);
+
+  const unread = open ? 0 : Math.max(0, messages.length - seenCount);
 
   function submit(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -25,9 +35,25 @@ export function Chat({ messages, onSend, disabled }: ChatProps): JSX.Element {
     setText("");
   }
 
+  if (collapsible && !open) {
+    return (
+      <button type="button" className="chat-launcher" onClick={() => setOpen(true)} aria-label="Chat öffnen">
+        <span aria-hidden="true">💬</span>
+        {unread > 0 ? <span className="chat-badge">{unread}</span> : null}
+      </button>
+    );
+  }
+
   return (
     <section className="panel chat">
-      <h2>Chat</h2>
+      <div className="chat-header">
+        <h2>Chat</h2>
+        {collapsible ? (
+          <button type="button" className="chat-close" onClick={() => setOpen(false)} aria-label="Chat schließen">
+            ✕
+          </button>
+        ) : null}
+      </div>
       <ul className="chat-list">
         {messages.length === 0 ? (
           <li className="muted small">Noch keine Nachrichten.</li>
@@ -41,7 +67,7 @@ export function Chat({ messages, onSend, disabled }: ChatProps): JSX.Element {
           ))
         )}
       </ul>
-      <form className="row chat-form" onSubmit={submit}>
+      <form className="chat-form" onSubmit={submit}>
         <input
           type="text"
           value={text}
@@ -52,7 +78,7 @@ export function Chat({ messages, onSend, disabled }: ChatProps): JSX.Element {
           onChange={(e) => setText(e.target.value)}
         />
         <button type="submit" disabled={disabled || text.trim().length === 0}>
-          Nachricht senden
+          Senden
         </button>
       </form>
     </section>

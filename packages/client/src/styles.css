@@ -492,10 +492,159 @@ label {
   bottom: 1rem;
   left: 1rem;
   z-index: 25;
-  width: 300px;
+}
+
+.chat-footer .chat {
+  width: 320px;
   max-height: 45vh;
   display: flex;
   flex-direction: column;
+}
+
+.chat-footer .chat-list {
+  max-height: 22vh;
+}
+
+.round-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.table-surface {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1088 / 463;
+  background: url(/table.svg) center / 100% 100% no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.trick-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.trick-current {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.trick-last {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.game-panels {
+  display: flex;
+  gap: 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem 1rem;
+  width: 100%;
+}
+
+.game-panels details {
+  flex: 1;
+  min-width: 0;
+}
+
+.game-panels summary {
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.panel-icon {
+  font-size: 1.1rem;
+}
+
+.panel-body {
+  margin-top: 0.6rem;
+}
+
+.chat-launcher {
+  position: relative;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.chat-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.3rem;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header h2 {
+  margin: 0;
+}
+
+.chat-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.1rem 0.3rem;
+}
+
+.chat-form {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.chat-form input {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-form button {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .hand-footer {

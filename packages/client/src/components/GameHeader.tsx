@@ -25,6 +25,11 @@ export function GameHeader({ snapshot, connected, onOpenProfile, onLeave }: Game
       <div className="topbar">
         <h1>{table.name}</h1>
         <div className="topbar-right">
+          {round ? (
+            <span className="round-badge" title="Runde">
+              {round.roundNumber}
+            </span>
+          ) : null}
           <span className={connected ? "badge" : "badge badge-muted"}>
             {connected ? "verbunden" : "offline"}
           </span>

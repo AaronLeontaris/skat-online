@@ -54,9 +54,8 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
     emit("table:setSettings", { settings: next });
   }
 
-  const seatsPanel = (
-    <section className="panel seats-panel">
-      <h2>Plätze</h2>
+  const seatsContent = (
+    <>
       <div className="seat-grid">
         {SEAT_INDICES.map((seatIndex) => {
           const player = seats[seatIndex] ?? null;
@@ -115,12 +114,11 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           {seated}/4 Plätzen belegt{startHint ? ` · ${startHint}` : ""}
         </span>
       </div>
-    </section>
+    </>
   );
 
-  const settingsPanel = (
-    <section className="panel">
-      <h2>Einstellungen</h2>
+  const settingsContent = (
+    <>
       <SettingsForm
         idPrefix="table"
         value={settingsDraft}
@@ -128,7 +126,7 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
         disabled={!editable || !connected}
       />
       {!editable ? <p className="muted small">Nur der Host kann vor Rundenbeginn ändern.</p> : null}
-    </section>
+    </>
   );
 
   return (
@@ -143,21 +141,53 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
       {active ? (
         <>
           <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
-          <div className="chat-footer">
-            <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
+
+          <div className="game-panels">
+            <details className="panel">
+              <summary>
+                <span className="panel-icon" aria-hidden="true">
+                  👥
+                </span>
+                Plätze
+              </summary>
+              <div className="panel-body">{seatsContent}</div>
+            </details>
+            <details className="panel">
+              <summary>
+                <span className="panel-icon" aria-hidden="true">
+                  ⚙️
+                </span>
+                Einstellungen
+              </summary>
+              <div className="panel-body">{settingsContent}</div>
+            </details>
+            <details className="panel">
+              <summary>
+                <span className="panel-icon" aria-hidden="true">
+                  🏆
+                </span>
+                Punkte
+              </summary>
+              <div className="panel-body">
+                <Scoreboard scores={round.scores} seats={seats} selfSeat={self.seatIndex} />
+              </div>
+            </details>
           </div>
-          <details className="panel details-panel">
-            <summary>Plätze &amp; Einstellungen</summary>
-            <div className="table-grid">
-              {seatsPanel}
-              {settingsPanel}
-            </div>
-          </details>
+
+          <div className="chat-footer">
+            <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} collapsible />
+          </div>
         </>
       ) : (
         <div className="table-grid">
-          {seatsPanel}
-          {settingsPanel}
+          <section className="panel seats-panel">
+            <h2>Plätze</h2>
+            {seatsContent}
+          </section>
+          <section className="panel">
+            <h2>Einstellungen</h2>
+            {settingsContent}
+          </section>
           {round ? (
             <section className="panel">
               <h2>Rundenergebnis</h2>
