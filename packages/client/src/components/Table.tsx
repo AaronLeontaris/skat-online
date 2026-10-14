@@ -47,6 +47,24 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
   const [openScores, setOpenScores] = useState(false);
   const editable = host && table.status !== "playing";
   const active = round !== null && ACTIVE_PHASES.includes(round.phase);
+  const isDeclarer = self.seatIndex !== null && round?.declarerSeat === self.seatIndex;
+  const tricksPlayed = round?.completedTricks.length ?? 0;
+  const canKontra =
+    round !== null &&
+    round.phase === "playing" &&
+    table.settings.kontraRe &&
+    !round.kontra &&
+    !isDeclarer &&
+    self.seatIndex !== null &&
+    tricksPlayed === 0;
+  const canRe =
+    round !== null &&
+    round.phase === "playing" &&
+    table.settings.kontraRe &&
+    round.kontra &&
+    !round.re &&
+    isDeclarer &&
+    tricksPlayed === 0;
 
   useEffect(() => {
     setSettingsDraft(table.settings);
@@ -169,6 +187,16 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
             >
               🏆 Punkte
             </button>
+            {canKontra ? (
+              <button type="button" className="toolbar-btn danger" onClick={() => emit("game:kontra", {})}>
+                Kontra
+              </button>
+            ) : null}
+            {canRe ? (
+              <button type="button" className="toolbar-btn danger" onClick={() => emit("game:re", {})}>
+                Re
+              </button>
+            ) : null}
           </div>
 
           {openSeats ? <div className="panel toolbar-panel">{seatsContent}</div> : null}

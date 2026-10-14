@@ -86,8 +86,6 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
   const paused = disconnectedSeats.length > 0;
 
   const canAct = connected;
-  const isDeclarer = self.seatIndex !== null && round.declarerSeat === self.seatIndex;
-  const tricksPlayed = round.completedTricks.length;
 
   const opponents =
     self.seatIndex !== null ? round.activeSeats.filter((s) => s !== self.seatIndex) : round.activeSeats;
@@ -128,29 +126,6 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
               emit={emit}
             />
           ) : null}
-
-          {round.phase === "playing" && table.settings.kontraRe
-            ? (() => {
-                const canKontra = !round.kontra && !isDeclarer && self.seatIndex !== null && tricksPlayed === 0;
-                const canRe = round.kontra && !round.re && isDeclarer && tricksPlayed === 0;
-                if (!canKontra && !canRe) return null;
-                return (
-                  <section className="panel">
-                    <h3>Kontra/Re</h3>
-                    {canKontra ? (
-                      <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:kontra", {})}>
-                        Kontra
-                      </button>
-                    ) : null}
-                    {canRe ? (
-                      <button type="button" className="primary" disabled={!canAct} onClick={() => emit("game:re", {})}>
-                        Re
-                      </button>
-                    ) : null}
-                  </section>
-                );
-              })()
-            : null}
         </div>
 
         <div className="opponents opponents-right">
