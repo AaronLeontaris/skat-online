@@ -118,14 +118,16 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
           </div>
 
-          <Controls
-            round={round}
-            selfSeat={self.seatIndex}
-            hand={self.hand}
-            seats={seats}
-            disabled={!canAct}
-            emit={emit}
-          />
+          {round.phase !== "bidding" ? (
+            <Controls
+              round={round}
+              selfSeat={self.seatIndex}
+              hand={self.hand}
+              seats={seats}
+              disabled={!canAct}
+              emit={emit}
+            />
+          ) : null}
 
           {round.phase === "playing" && table.settings.kontraRe
             ? (() => {
@@ -162,6 +164,19 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
           ) : null}
         </div>
       </div>
+
+      {round.phase === "bidding" ? (
+        <div className="bid-overlay">
+          <Controls
+            round={round}
+            selfSeat={self.seatIndex}
+            hand={self.hand}
+            seats={seats}
+            disabled={!canAct}
+            emit={emit}
+          />
+        </div>
+      ) : null}
 
       {self.seatIndex !== null && self.hand.length > 0 ? (
         <div className="hand-footer">
