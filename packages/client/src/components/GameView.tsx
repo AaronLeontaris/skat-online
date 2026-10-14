@@ -118,7 +118,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             <TrickView currentTrick={round.currentTrick} completedTricks={round.completedTricks} seats={seats} />
           </div>
 
-          {round.phase !== "bidding" ? (
+          {round.phase !== "bidding" && round.phase !== "skat" ? (
             <Controls
               round={round}
               selfSeat={self.seatIndex}
@@ -165,7 +165,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
         </div>
       </div>
 
-      {round.phase === "bidding" ? (
+      {round.phase === "bidding" || round.phase === "skat" ? (
         <div className="bid-overlay">
           <Controls
             round={round}
