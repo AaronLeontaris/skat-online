@@ -22,7 +22,7 @@ function seatedCount(seats: readonly (PublicPlayer | null)[]): number {
 
 /** Seats, settings, ready/start controls and the running game area. */
 export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
-  const { emit, user, connected, messages } = useSession();
+  const { emit, user, connected, messages, clearTable } = useSession();
   const { table, round, self } = snapshot;
   const host = table.hostUserId === user?.id;
   const seats = table.seats;
@@ -138,7 +138,10 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
         snapshot={snapshot}
         connected={connected}
         onOpenProfile={onOpenProfile}
-        onLeave={() => emit("table:leave", {})}
+        onLeave={() => {
+          emit("table:leave", {});
+          clearTable();
+        }}
       />
 
       {active ? (

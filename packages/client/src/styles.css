@@ -536,6 +536,19 @@ label {
   color: var(--accent);
 }
 
+.pause-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  background: #fff7e0;
+  border: 1px solid #d9a900;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #7a5b00;
+}
+
 .toolbar-panel {
   max-width: 1100px;
   margin: 0.5rem auto 0;

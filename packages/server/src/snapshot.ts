@@ -19,6 +19,7 @@ export function buildTablePublic(table: TableSession): TablePublicState {
             avatarUrl: p.avatarUrl,
             seatIndex: i as SeatIndex,
             ready: p.ready,
+            connected: p.connected,
           }
         : null,
     ),

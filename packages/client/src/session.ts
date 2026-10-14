@@ -34,6 +34,7 @@ export type SessionAction =
   | { type: "loggedIn"; token: string; user: User }
   | { type: "userUpdated"; user: User }
   | { type: "loggedOut" }
+  | { type: "leftTable" }
   | { type: "connected"; connected: boolean }
   | { type: "snapshot"; snapshot: Snapshot }
   | { type: "table"; table: Snapshot["table"] }
@@ -63,6 +64,8 @@ export function sessionReducer(state: SessionState, action: SessionAction): Sess
         loading: false,
         connected: false,
       };
+    case "leftTable":
+      return { ...state, snapshot: null, messages: [], error: null };
     case "connected":
       // On disconnect keep the last snapshot on screen (greying out) instead of blanking it.
       return { ...state, connected: action.connected };

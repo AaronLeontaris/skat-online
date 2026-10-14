@@ -54,12 +54,19 @@ export function setupSocket(io: Server, store: TableStore): void {
     void setPresence(userId);
     socket.on("disconnect", () => {
       void clearPresence(userId);
+      const table = store.tableOfUser(userId);
+      if (table) {
+        store.markDisconnected(table, userId);
+        void sync(io, table);
+      }
     });
 
     const seated = store.tableOfUser(userId);
     if (seated) {
       socket.join(roomName(seated.tableId));
+      store.markConnected(seated, userId);
       socket.emit("snapshot", buildSnapshot(seated, userId));
+      void sync(io, seated);
     }
 
     socket.on("table:create", (raw: unknown) => {

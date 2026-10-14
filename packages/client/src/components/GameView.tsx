@@ -79,6 +79,12 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
   const { self, table } = snapshot;
   const seats = table.seats;
 
+  const disconnectedSeats = round.activeSeats.filter((s) => {
+    const player = seats[s];
+    return player !== null && !player.connected;
+  });
+  const paused = disconnectedSeats.length > 0;
+
   const canAct = connected;
   const isDeclarer = self.seatIndex !== null && round.declarerSeat === self.seatIndex;
   const tricksPlayed = round.completedTricks.length;
@@ -88,6 +94,13 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
 
   return (
     <div className="game-view">
+      {paused ? (
+        <div className="pause-banner">
+          <span aria-hidden="true">⏸️</span> Spiel pausiert – warte auf{" "}
+          {disconnectedSeats.map((s) => seatLabel(seats, s)).join(", ")}
+        </div>
+      ) : null}
+
       <div className="game-table">
         <div className="opponents opponents-left">
           {opponents.length > 0 ? (

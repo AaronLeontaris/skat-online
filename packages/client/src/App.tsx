@@ -35,15 +35,13 @@ function AppContent(): JSX.Element {
         </div>
       ) : null}
 
-      {snapshot ? (
-        <Table snapshot={snapshot} onOpenProfile={openProfile} />
-      ) : screen === "profile" ? (
+      {screen === "profile" ? (
         <div className="screen">
           <header className="topbar">
             <h1>Skat Online</h1>
             <div className="topbar-right">
               <button type="button" onClick={() => setScreen("lobby")}>
-                Zurück zur Lobby
+                Zurück
               </button>
               <button type="button" onClick={() => signOut()}>
                 Abmelden
@@ -52,6 +50,8 @@ function AppContent(): JSX.Element {
           </header>
           <Profile user={user} token={token} onUserUpdated={setUser} onError={setError} />
         </div>
+      ) : snapshot ? (
+        <Table snapshot={snapshot} onOpenProfile={openProfile} />
       ) : (
         <Lobby token={token} onOpenProfile={openProfile} />
       )}

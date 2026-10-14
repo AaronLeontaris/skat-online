@@ -29,6 +29,7 @@ export interface PublicPlayer {
   avatarUrl: string | null;
   seatIndex: SeatIndex | null;
   ready: boolean;
+  connected: boolean;
 }
 
 export interface PlayedCard {

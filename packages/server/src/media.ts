@@ -16,7 +16,7 @@ function authUserId(req: Request): string | null {
 }
 
 mediaRouter.post(
-  "/avatar",
+  "/profile/avatar",
   express.raw({
     type: ["image/png", "image/jpeg", "image/heic", "image/heif", "application/octet-stream"],
     limit: `${config.maxUploadMb}mb`,

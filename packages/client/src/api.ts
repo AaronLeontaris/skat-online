@@ -113,7 +113,7 @@ export function me(token: string): Promise<User> {
   return request<User>("/api/auth/me", { method: "GET", headers: jsonHeaders(token) }, true);
 }
 
-/** Uploads the file as a raw binary body with the file's own MIME type. */
+/** Uploads the file as a raw binary body with the file's own MIME type; response is `{ avatarUrl }`. */
 export function uploadAvatar(token: string, file: File): Promise<{ avatarUrl?: string }> {
   const contentType = file.type && file.type.length > 0 ? file.type : "application/octet-stream";
   return request<{ avatarUrl?: string }>(
@@ -123,7 +123,7 @@ export function uploadAvatar(token: string, file: File): Promise<{ avatarUrl?: s
       headers: { Authorization: `Bearer ${token}`, "Content-Type": contentType },
       body: file,
     },
-    false,
+    true,
   );
 }
 

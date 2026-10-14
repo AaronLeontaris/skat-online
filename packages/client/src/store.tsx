@@ -36,6 +36,7 @@ export interface SessionContextValue extends SessionState {
   signOut: () => void;
   setUser: (user: User) => void;
   setError: (message: string | null) => void;
+  clearTable: () => void;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -155,9 +156,13 @@ export function SessionProvider({ children }: { children: ReactNode }): JSX.Elem
     dispatch({ type: "error", message });
   }, []);
 
+  const clearTable = useCallback(() => {
+    dispatch({ type: "leftTable" });
+  }, []);
+
   const value = useMemo<SessionContextValue>(
-    () => ({ ...state, emit, on, signIn, signOut, setUser, setError }),
-    [state, emit, on, signIn, signOut, setUser, setError],
+    () => ({ ...state, emit, on, signIn, signOut, setUser, setError, clearTable }),
+    [state, emit, on, signIn, signOut, setUser, setError, clearTable],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

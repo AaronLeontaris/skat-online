@@ -8,6 +8,7 @@ export interface SeatPlayer {
   username: string;
   avatarUrl: string | null;
   ready: boolean;
+  connected: boolean;
 }
 
 export interface NewPlayer {
@@ -48,6 +49,7 @@ export class TableStore {
       username: host.username,
       avatarUrl: host.avatarUrl,
       ready: false,
+      connected: true,
     };
     this.tables.set(table.tableId, table);
     return table;
@@ -90,6 +92,7 @@ export class TableStore {
       username: player.username,
       avatarUrl: player.avatarUrl,
       ready: false,
+      connected: true,
     };
     return { ok: true };
   }
@@ -113,6 +116,20 @@ export class TableStore {
     if (seat === null) return;
     const player = table.seats[seat];
     if (player) player.ready = ready;
+  }
+
+  markConnected(table: TableSession, userId: string): void {
+    const seat = this.seatOf(table, userId);
+    if (seat === null) return;
+    const player = table.seats[seat];
+    if (player) player.connected = true;
+  }
+
+  markDisconnected(table: TableSession, userId: string): void {
+    const seat = this.seatOf(table, userId);
+    if (seat === null) return;
+    const player = table.seats[seat];
+    if (player) player.connected = false;
   }
 
   setSettings(table: TableSession, settings: TableSettings): void {
