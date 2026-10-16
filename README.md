@@ -44,10 +44,10 @@ Profile funktionieren; Benutzer/Chat werden dann nur nicht über einen Neustart 
 
 | E-Mail | Passwort | Name |
 |---|---|---|
-| anna@example.com | anna123 | Anna |
-| ben@example.com | ben123 | Ben |
-| clara@example.com | clara123 | Clara |
-| david@example.com | david123 | David |
+| frieda@example.com | frieda123 | Frieda |
+| gabriel@example.com | gabriel123 | Gabriel |
+| aaron@example.com | aaron123 | Aaron |
+| pascal@example.com | pascal123 | Pascal |
 
 ## End-to-End-Smoke-Test
 

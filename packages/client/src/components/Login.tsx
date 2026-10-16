@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { ApiError, login as apiLogin } from "../api";
 import { useSession } from "../store";
 
-const SEED_HINT = "anna@example.com / anna123";
+const SEED_HINT = "frieda@example.com / frieda123";
 
 /** Email + password sign-in against `POST /api/auth/login`. */
 export function Login(): JSX.Element {

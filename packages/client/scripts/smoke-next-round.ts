@@ -4,9 +4,9 @@ import type { Snapshot } from "@skat/shared";
 
 const BASE = "http://localhost:4000";
 const ACCOUNTS = [
-  { email: "anna@example.com", password: "anna123" },
-  { email: "ben@example.com", password: "ben123" },
-  { email: "clara@example.com", password: "clara123" },
+  { email: "frieda@example.com", password: "frieda123" },
+  { email: "gabriel@example.com", password: "gabriel123" },
+  { email: "aaron@example.com", password: "aaron123" },
 ];
 
 function log(...a: unknown[]): void {

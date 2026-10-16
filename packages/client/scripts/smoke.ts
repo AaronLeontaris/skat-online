@@ -8,10 +8,10 @@ import type { Snapshot, TableSettings } from "@skat/shared";
 
 const BASE = process.env.SMOKE_BASE ?? "http://localhost:4000";
 const ACCOUNTS = [
-  { email: "anna@example.com", password: "anna123" },
-  { email: "ben@example.com", password: "ben123" },
-  { email: "clara@example.com", password: "clara123" },
-  { email: "david@example.com", password: "david123" },
+  { email: "frieda@example.com", password: "frieda123" },
+  { email: "gabriel@example.com", password: "gabriel123" },
+  { email: "aaron@example.com", password: "aaron123" },
+  { email: "pascal@example.com", password: "pascal123" },
 ];
 
 function log(...a: unknown[]): void {
