@@ -36,7 +36,7 @@ export function Login(): JSX.Element {
   return (
     <div className="screen screen-center">
       <form className="panel login-panel" onSubmit={onSubmit}>
-        <h1>Skat Online</h1>
+        <img className="login-logo" src="/logo.png" alt="Skat Online" />
         <label htmlFor="login-email">E-Mail</label>
         <input
           id="login-email"

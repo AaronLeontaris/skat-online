@@ -39,9 +39,8 @@ function AppContent(): JSX.Element {
       {screen === "profile" ? (
         <div className="screen">
           <header className="topbar">
-            <h1>Skat Online</h1>
+            <img className="brand-logo" src="/logo.png" alt="Skat Online" />
             <div className="topbar-right">
-              <img className="header-logo" src="/logo.png" alt="Logo" />
               <button type="button" onClick={() => setScreen("lobby")}>
                 Zurück
               </button>

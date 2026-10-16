@@ -77,9 +77,8 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
   return (
     <div className="screen">
       <header className="topbar">
-        <h1>Skat Online</h1>
+        <img className="brand-logo" src="/logo.png" alt="Skat Online" />
         <div className="topbar-right">
-          <img className="header-logo" src="/logo.png" alt="Logo" />
           <span className="muted">{user?.username ?? ""}</span>
           <span className={snapshot ? "badge" : "badge badge-muted"}>Lobby</span>
           <button type="button" onClick={onOpenProfile}>

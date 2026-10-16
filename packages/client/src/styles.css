@@ -5,6 +5,19 @@
   width: auto;
 }
 
+.brand-logo {
+  height: 2.4rem;
+  width: auto;
+  display: block;
+}
+
+.login-logo {
+  width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+
 .splash {
   position: fixed;
   inset: 0;
@@ -45,20 +58,20 @@
 }
 
 :root {
-  color-scheme: light;
-  --bg: #f4f6f8;
-  --panel: #ffffff;
-  --border: #c9d1d9;
-  --text: #1c2530;
-  --muted: #6b7684;
-  --accent: #1f6feb;
-  --accent-text: #ffffff;
-  --danger: #b42318;
-  --ok: #1a7f37;
+  color-scheme: dark;
+  --bg: #221710;
+  --panel: #1a130c;
+  --border: #8a6d2f;
+  --text: #efe4c6;
+  --muted: #ab9666;
+  --accent: #d4af37;
+  --accent-text: #171105;
+  --danger: #e35d52;
+  --ok: #4fbf7d;
   --red: #c8102e;
   --black: #14181d;
   --felt: #14624a;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: Georgia, "Times New Roman", "Palatino Linotype", "Book Antiqua", serif;
   font-size: 16px;
 }
 
@@ -94,14 +107,15 @@ button {
   font: inherit;
   padding: 0.35rem 0.7rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: #fff;
+  border-radius: 2px;
+  background: #2b1f13;
   color: var(--text);
   cursor: pointer;
 }
 
 button:hover:not(:disabled) {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 button:disabled {
@@ -113,6 +127,7 @@ button.primary {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-text);
+  font-weight: 600;
 }
 
 input[type="text"],
@@ -122,8 +137,8 @@ select {
   font: inherit;
   padding: 0.35rem 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: #fff;
+  border-radius: 2px;
+  background: #241a10;
   color: var(--text);
 }
 
@@ -155,7 +170,7 @@ label {
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 3px;
   padding: 0.9rem 1rem;
 }
 
@@ -168,7 +183,7 @@ label {
   padding: 0.6rem 0.9rem;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 3px;
 }
 
 .topbar-right {
@@ -181,10 +196,10 @@ label {
 .badge {
   display: inline-block;
   padding: 0.1rem 0.45rem;
-  border-radius: 999px;
+  border-radius: 3px;
   border: 1px solid var(--border);
   font-size: 0.75rem;
-  background: #eef2f7;
+  background: #2b1f13;
 }
 
 .badge-muted {
@@ -246,11 +261,11 @@ label {
   align-items: center;
   gap: 0.6rem;
   padding: 0.5rem 0.8rem;
-  background: #fdecea;
+  background: #3a1f1a;
   border: 1px solid var(--danger);
-  border-radius: 8px;
+  border-radius: 3px;
   color: var(--danger);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .toast-close {
@@ -302,7 +317,7 @@ label {
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);
-  background: #eef2f7;
+  background: #2b1f13;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -359,14 +374,14 @@ label {
   gap: 0.6rem;
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 2px;
   flex-wrap: wrap;
 }
 
 /* Settings. */
 .settings-form {
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 2px;
   padding: 0.5rem 0.7rem;
   margin: 0;
   display: flex;
@@ -470,13 +485,13 @@ label {
   gap: 0.4rem;
   padding: 0.6rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--panel);
 }
 
 .opponent-active {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.2);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
 }
 
 .opponent-name {
@@ -496,17 +511,17 @@ label {
 .card-back {
   width: 1.1rem;
   height: 1.6rem;
-  border-radius: 3px;
-  border: 1px solid #0f4c3a;
-  background: repeating-linear-gradient(45deg, #1b6b50, #1b6b50 2px, #14624a 2px, #14624a 4px);
+  border-radius: 2px;
+  border: 1px solid var(--accent);
+  background: repeating-linear-gradient(45deg, #14100a, #14100a 3px, #2b1f13 3px, #2b1f13 6px);
 }
 
 .warning-badge {
   display: inline-block;
   padding: 0.05rem 0.55rem;
-  border-radius: 999px;
+  border-radius: 3px;
   font-weight: 700;
-  background: #fdecea;
+  background: #3a1f1a;
   border: 1px solid var(--danger);
   color: var(--danger);
 }
@@ -570,7 +585,7 @@ label {
   font-weight: 700;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 999px;
+  border-radius: 3px;
   padding: 0.25rem 0.8rem;
   font-size: 0.85rem;
 }
@@ -582,7 +597,7 @@ label {
 
 .toolbar-btn.active {
   border-color: var(--accent);
-  background: #eef4ff;
+  background: #3a2f14;
   color: var(--accent);
 }
 
@@ -623,11 +638,11 @@ label {
   gap: 0.5rem;
   justify-content: center;
   padding: 0.6rem 1rem;
-  background: #fff7e0;
-  border: 1px solid #d9a900;
-  border-radius: 8px;
+  background: #3a2f14;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
   font-weight: 600;
-  color: #7a5b00;
+  color: var(--accent);
 }
 
 .toolbar-panel {
@@ -667,8 +682,8 @@ label {
   flex-direction: column;
   align-items: center;
   gap: 0.3rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 6px;
+  background: rgba(20, 15, 8, 0.85);
+  border-radius: 2px;
   padding: 0.4rem 0.6rem;
 }
 
@@ -706,7 +721,7 @@ label {
   position: relative;
   width: 3rem;
   height: 3rem;
-  border-radius: 50%;
+  border-radius: 4px;
   font-size: 1.4rem;
   border: 1px solid var(--border);
   background: var(--panel);
@@ -720,7 +735,7 @@ label {
   right: -4px;
   min-width: 1.2rem;
   height: 1.2rem;
-  border-radius: 999px;
+  border-radius: 3px;
   background: var(--danger);
   color: #fff;
   font-size: 0.7rem;
@@ -774,8 +789,8 @@ label {
 }
 
 .hand-footer .hand-view {
-  background: rgba(255, 255, 255, 0.97);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+  background: rgba(26, 19, 12, 0.97);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   margin: 0;
 }
 
@@ -808,8 +823,8 @@ details.panel summary {
   gap: 0.5rem;
   padding: 0.5rem;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  background: #fbfcfe;
+  border-radius: 2px;
+  background: #241a10;
   min-height: 3rem;
 }
 
@@ -818,7 +833,7 @@ details.panel summary {
 }
 
 .seat-empty {
-  background: #f7f8fa;
+  background: #1a130c;
 }
 
 .seat-number {
@@ -891,7 +906,7 @@ details.panel summary {
 .card {
   width: 3.1rem;
   height: 4.3rem;
-  border-radius: 6px;
+  border-radius: 2px;
   border: 1px solid var(--border);
   background: #fff;
   display: flex;
@@ -922,16 +937,16 @@ details.panel summary {
 
 .card-playable {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.25);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.35);
 }
 
 .card-playable:hover {
-  background: #eef4ff;
+  background: #3a2f14;
 }
 
 .card-selected {
-  background: #fff6d8;
-  border-color: #d9a900;
+  background: #4a3a14;
+  border-color: var(--accent);
 }
 
 .card-disabled {
@@ -1020,7 +1035,7 @@ details.panel summary {
 }
 
 .score-table .self-row {
-  background: #eef4ff;
+  background: #3a2f14;
 }
 
 .score-value {
@@ -1043,7 +1058,7 @@ details.panel summary {
   max-height: 16rem;
   overflow-y: auto;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
