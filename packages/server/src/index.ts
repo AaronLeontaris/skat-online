@@ -1,6 +1,8 @@
 import http from "node:http";
+import { existsSync } from "node:fs";
 import express from "express";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Server } from "socket.io";
 import { authRouter, initUsers } from "./auth";
 import { config } from "./config";
@@ -27,6 +29,18 @@ async function main(): Promise<void> {
   app.get("/api/tables", (_req, res) => {
     res.json(store.openTables().map(buildTablePublic));
   });
+
+  // Serve the built client (SPA) in production; skipped when dist/ is absent (dev).
+  const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), "../../../client/dist");
+  if (existsSync(clientDist)) {
+    app.use(express.static(clientDist));
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api") || req.path.startsWith("/uploads") || req.path.startsWith("/socket.io")) {
+        return next();
+      }
+      res.sendFile(resolve(clientDist, "index.html"));
+    });
+  }
 
   const server = http.createServer(app);
   const io = new Server(server, {

@@ -42,7 +42,7 @@ services:
       REDIS_HOST: redis
       UPLOAD_DIR: /app/uploads
     ports:
-      - "4000:4000"
+      - "80:4000"
     volumes:
       - uploads:/app/uploads
 
