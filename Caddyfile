@@ -1,5 +1,5 @@
-# Skat Online reverse proxy — replace the domain with your own.
-# Caddy auto-obtains and renews a Let's Encrypt certificate for it.
-skat.example.com {
+# Skat Online reverse proxy.
+# Caddy auto-obtains and renews a Let's Encrypt certificate for these names.
+skat.boo, www.skat.boo {
     reverse_proxy server:4000
 }
