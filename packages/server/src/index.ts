@@ -31,7 +31,7 @@ async function main(): Promise<void> {
   });
 
   // Serve the built client (SPA) in production; skipped when dist/ is absent (dev).
-  const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), "../../../client/dist");
+  const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), "../../client/dist");
   if (existsSync(clientDist)) {
     app.use(express.static(clientDist));
     app.get("*", (req, res, next) => {
