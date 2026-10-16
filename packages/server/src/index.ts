@@ -48,8 +48,8 @@ async function main(): Promise<void> {
   });
   setupSocket(io, store);
 
-  server.listen(config.port, () => {
-    console.log(`[server] läuft auf http://localhost:${config.port}`);
+  server.listen(config.port, "0.0.0.0", () => {
+    console.log(`[server] läuft auf http://0.0.0.0:${config.port}`);
   });
 }
 
