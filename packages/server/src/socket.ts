@@ -25,7 +25,7 @@ function emitError(socket: Socket, code: string, message: string): void {
   socket.emit("error", { code, message });
 }
 
-async function sync(io: Server, table: TableSession): Promise<void> {
+export async function sync(io: Server, table: TableSession): Promise<void> {
   const room = roomName(table.tableId);
   io.to(room).emit("table:updated", buildTablePublic(table));
   try {

@@ -7,7 +7,7 @@ import { Server } from "socket.io";
 import { authRouter, initUsers } from "./auth";
 import { config } from "./config";
 import { initDb } from "./db";
-import { mediaRouter } from "./media";
+import { createMediaRouter } from "./media";
 import { initRedis } from "./redis";
 import { buildTablePublic } from "./snapshot";
 import { setupSocket } from "./socket";
@@ -23,7 +23,13 @@ async function main(): Promise<void> {
   const app = express();
   app.use(express.json());
   app.use("/api/auth", authRouter);
-  app.use("/api", mediaRouter);
+
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: { origin: config.clientOrigin, credentials: true },
+  });
+
+  app.use("/api", createMediaRouter(store, io));
   app.use("/uploads", express.static(resolve(config.uploadDir)));
 
   app.get("/api/tables", (_req, res) => {
@@ -42,10 +48,6 @@ async function main(): Promise<void> {
     });
   }
 
-  const server = http.createServer(app);
-  const io = new Server(server, {
-    cors: { origin: config.clientOrigin, credentials: true },
-  });
   setupSocket(io, store);
 
   server.listen(config.port, "0.0.0.0", () => {

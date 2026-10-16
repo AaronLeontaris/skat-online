@@ -132,6 +132,17 @@ export class TableStore {
     if (player) player.connected = false;
   }
 
+  /** Update a seated player's display info after a profile change. */
+  updateSeatProfile(table: TableSession, userId: string, username: string, avatarUrl: string | null): void {
+    const seat = this.seatOf(table, userId);
+    if (seat === null) return;
+    const player = table.seats[seat];
+    if (player) {
+      player.username = username;
+      player.avatarUrl = avatarUrl;
+    }
+  }
+
   setSettings(table: TableSession, settings: TableSettings): void {
     table.settings = settings;
   }
