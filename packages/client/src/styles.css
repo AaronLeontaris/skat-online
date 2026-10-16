@@ -391,10 +391,20 @@ label {
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
-  padding: 0.5rem 0.6rem;
+  padding: 0.9rem 1rem;
   border: 1px solid var(--border);
   border-radius: 2px;
   flex-wrap: wrap;
+}
+
+.join-seat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: #241a10;
 }
 
 /* Settings. */

@@ -128,7 +128,7 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
                     </div>
                     {joinTableId === table.tableId ? (
                       <div className="row">
-                        <label>
+                        <label className="join-seat">
                           Platz
                           <select
                             value={joinSeat}
