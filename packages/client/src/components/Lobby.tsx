@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import type { TableSettings } from "@skat/shared";
 import { fetchTables, type OpenTable } from "../api";
 import { useSession } from "../store";
-import { Chat } from "./Chat";
 import { SettingsForm } from "./SettingsForm";
 
 const SEAT_INDICES = [0, 1, 2, 3] as const;
@@ -31,7 +30,7 @@ export interface LobbyProps {
 
 /** Table list, table creation, joining, and a chat column. */
 export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
-  const { emit, messages, error, snapshot, user } = useSession();
+  const { emit, error, snapshot, user } = useSession();
   const [tables, setTables] = useState<OpenTable[]>([]);
   const [loading, setLoading] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
@@ -203,8 +202,6 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
             </p>
           )}
         </section>
-
-        <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} />
       </div>
     </div>
   );
