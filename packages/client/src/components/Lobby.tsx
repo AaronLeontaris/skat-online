@@ -30,7 +30,7 @@ export interface LobbyProps {
 
 /** Table list, table creation, joining, and a chat column. */
 export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
-  const { emit, error, snapshot, user } = useSession();
+  const { emit, error, snapshot, user, signOut } = useSession();
   const [tables, setTables] = useState<OpenTable[]>([]);
   const [loading, setLoading] = useState(false);
   const [listError, setListError] = useState<string | null>(null);
@@ -82,6 +82,9 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
           <span className={snapshot ? "badge" : "badge badge-muted"}>Lobby</span>
           <button type="button" onClick={onOpenProfile}>
             Profil
+          </button>
+          <button type="button" onClick={signOut}>
+            Abmelden
           </button>
         </div>
       </header>
