@@ -41,12 +41,27 @@ services:
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
       UPLOAD_DIR: /app/uploads
-    ports:
-      - "80:4000"
+    expose:
+      - "4000"
     volumes:
       - uploads:/app/uploads
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - server
 
 volumes:
   pgdata:
   redisdata:
   uploads:
+  caddy_data:
+  caddy_config:
