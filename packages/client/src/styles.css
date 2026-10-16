@@ -1,5 +1,49 @@
 /* Skat Online – deliberately minimal v1 styling (no images, no sounds). */
 
+.header-logo {
+  height: 2.2rem;
+  width: auto;
+}
+
+.splash {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 1000;
+  animation: splash-fade 0.5s ease 1.6s forwards;
+}
+
+.splash-logo {
+  width: min(340px, 75vw);
+  height: auto;
+  animation: splash-pop 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes splash-pop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes splash-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 :root {
   color-scheme: light;
   --bg: #f4f6f8;

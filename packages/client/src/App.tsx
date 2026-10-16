@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SessionProvider, useSession } from "./store";
 import { Login } from "./components/Login";
 import { Lobby } from "./components/Lobby";
 import { Profile } from "./components/Profile";
+import { Splash } from "./components/Splash";
 import { Table } from "./components/Table";
 
 type Screen = "lobby" | "profile";
@@ -40,6 +41,7 @@ function AppContent(): JSX.Element {
           <header className="topbar">
             <h1>Skat Online</h1>
             <div className="topbar-right">
+              <img className="header-logo" src="/logo.png" alt="Logo" />
               <button type="button" onClick={() => setScreen("lobby")}>
                 Zurück
               </button>
@@ -61,9 +63,19 @@ function AppContent(): JSX.Element {
 
 /** Root component: session provider plus a tiny screen switch. */
 export function App(): JSX.Element {
+  const [splash, setSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSplash(false), 2200);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
-    <SessionProvider>
-      <AppContent />
-    </SessionProvider>
+    <>
+      {splash ? <Splash /> : null}
+      <SessionProvider>
+        <AppContent />
+      </SessionProvider>
+    </>
   );
 }

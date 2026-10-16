@@ -25,6 +25,7 @@ export function GameHeader({ snapshot, connected, onOpenProfile, onLeave }: Game
       <div className="topbar">
         <h1>{table.name}</h1>
         <div className="topbar-right">
+          <img className="header-logo" src="/logo.png" alt="Logo" />
           <span className={connected ? "badge" : "badge badge-muted"}>
             {connected ? "verbunden" : "offline"}
           </span>
