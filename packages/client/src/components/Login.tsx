@@ -2,8 +2,6 @@ import { useState, type FormEvent } from "react";
 import { ApiError, login as apiLogin, register as apiRegister } from "../api";
 import { useSession } from "../store";
 
-const SEED_HINT = "frieda@example.com / frieda123";
-
 /** Email + password sign-in / sign-up against the auth API. */
 export function Login(): JSX.Element {
   const { signIn } = useSession();
@@ -12,13 +10,12 @@ export function Login(): JSX.Element {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [registered, setRegistered] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   function switchMode(next: "login" | "register"): void {
     setMode(next);
     setError(null);
-    setInfo(null);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -26,17 +23,13 @@ export function Login(): JSX.Element {
     if (busy) return;
     setBusy(true);
     setError(null);
-    setInfo(null);
     try {
       if (mode === "login") {
         const result = await apiLogin(email.trim(), password);
         signIn(result.token, result.user);
       } else {
         const result = await apiRegister(email.trim(), password, username.trim());
-        setInfo(
-          `Fast geschafft! Wir haben eine Bestätigungs-E-Mail an ${result.email ?? email.trim()} gesendet. Bitte klicke den Link darin.`,
-        );
-        switchMode("login");
+        setRegistered(result.email ?? email.trim());
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
@@ -51,6 +44,27 @@ export function Login(): JSX.Element {
     } finally {
       setBusy(false);
     }
+  }
+
+  if (registered !== null) {
+    return (
+      <div className="screen screen-center">
+        <div className="panel login-panel verify-panel">
+          <img className="login-logo" src="/logo.png" alt="Skat Online" />
+          <h2 className="verify-title">Bestätige dein Konto</h2>
+          <p className="ok-text">
+            Wir haben eine Bestätigungs-E-Mail an <strong>{registered}</strong> gesendet.
+          </p>
+          <p className="muted small">
+            Bitte öffne den Link in der E-Mail, um dein Konto zu aktivieren. Falls du keine E-Mail siehst, wirf auch einen
+            Blick in deinen Spam-Ordner.
+          </p>
+          <button type="button" onClick={() => setRegistered(null)}>
+            Zurück zur Anmeldung
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -113,11 +127,9 @@ export function Login(): JSX.Element {
             {error}
           </p>
         ) : null}
-        {info ? <p className="info-text">{info}</p> : null}
         <button type="submit" className="primary" disabled={busy}>
           {busy ? "Bitte warten…" : mode === "login" ? "Anmelden" : "Registrieren"}
         </button>
-        {mode === "login" ? <p className="hint">Testkonto: {SEED_HINT}</p> : null}
       </form>
     </div>
   );

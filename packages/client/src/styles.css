@@ -337,6 +337,15 @@ label {
   margin-top: 0.4rem;
 }
 
+.verify-panel {
+  text-align: center;
+}
+
+.verify-title {
+  color: var(--accent);
+  margin: 0.25rem 0 0.5rem;
+}
+
 .profile-row {
   display: flex;
   gap: 1rem;
