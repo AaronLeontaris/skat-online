@@ -148,6 +148,7 @@ export function setupSocket(io: Server, store: TableStore): void {
       const prevDealer = table.round?.dealerSeat ?? null;
       const dealer = nextDealer(table, prevDealer);
       startRound(table, (table.round?.roundNumber ?? 0) + 1, dealer);
+      io.to(roomName(table.tableId)).emit("sound:play", { sound: "shuffelingCards", kind: "sound" });
       void sync(io, table);
     });
 
@@ -176,6 +177,11 @@ export function setupSocket(io: Server, store: TableStore): void {
       if (!parsed.success) return emitError(socket, "INVALID", "Ungültige Anfrage");
       const res = applyPickupSkat(table.round, seat, parsed.data);
       if (!res.ok) return emitError(socket, "ILLEGAL", res.error);
+      if (parsed.data.action === "take") {
+        const room = roomName(table.tableId);
+        io.to(room).emit("sound:play", { sound: "playingOneCard", kind: "sound" });
+        io.to(room).emit("sound:play", { sound: "playingOneCard", kind: "sound" });
+      }
       void sync(io, table);
     });
 
@@ -201,6 +207,7 @@ export function setupSocket(io: Server, store: TableStore): void {
       const res = applyPlay(table.round, seat, parsed.data.card);
       if (!res.ok) return emitError(socket, "ILLEGAL", res.error);
       if (table.round.phase === "scoring") scoreRound(table, table.round);
+      io.to(roomName(table.tableId)).emit("sound:play", { sound: "playingOneCard", kind: "sound" });
       void sync(io, table);
     });
 
@@ -235,6 +242,14 @@ export function setupSocket(io: Server, store: TableStore): void {
       void sendChat(table.tableId, userId, user?.username ?? "?", parsed.data.text).then((msg) => {
         io.to(roomName(table.tableId)).emit("chat:message", msg);
       });
+    });
+
+    socket.on("sound:play", (raw: unknown) => {
+      const table = store.tableOfUser(userId);
+      if (!table) return;
+      const parsed = clientPayloadSchemas["sound:play"].safeParse(raw);
+      if (!parsed.success) return;
+      io.to(roomName(table.tableId)).emit("sound:play", parsed.data);
     });
   });
 }

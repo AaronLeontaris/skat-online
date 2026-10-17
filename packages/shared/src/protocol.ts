@@ -104,6 +104,8 @@ export interface RoundPublicState {
 
 export type TableStatus = "waiting" | "playing";
 
+export type SoundKind = "sound" | "speech";
+
 export interface TablePublicState {
   tableId: string;
   name: string;
@@ -163,12 +165,14 @@ export interface ClientToServer {
   "game:kontra": Record<string, never>;
   "game:re": Record<string, never>;
   "chat:send": { text: string };
+  "sound:play": { sound: string; kind: SoundKind };
 }
 
 export interface ServerToClient {
   snapshot: Snapshot;
   "game:event": { seq: number; event: GameEvent };
   "chat:message": ChatMessage;
+  "sound:play": { sound: string; kind: SoundKind };
   error: { code: string; message: string };
   "table:updated": TablePublicState;
 }

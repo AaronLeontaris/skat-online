@@ -154,7 +154,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
       ) : null}
 
       {self.seatIndex !== null && self.hand.length > 0 ? (
-        <div className="hand-footer">
+        <div className="hand-footer" key={round.roundNumber}>
           <HandView
             hand={self.hand}
             legalPlays={self.legalPlays}

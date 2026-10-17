@@ -33,16 +33,17 @@ export function HandView({ hand, legalPlays, onPlay, ownerName }: HandViewProps)
         {legalPlays ? " · Du bist dran" : ""}
       </p>
       <div className="hand">
-        {sorted.map((card) => {
+        {sorted.map((card, index) => {
           const playable = playableKeys.has(cardKey(card));
           return (
-            <CardView
-              key={cardKey(card)}
-              card={card}
-              playable={playable}
-              disabled={!playable}
-              onClick={playable ? onPlay : undefined}
-            />
+            <span key={cardKey(card)} className="hand-deal" style={{ animationDelay: `${index * 45}ms` }}>
+              <CardView
+                card={card}
+                playable={playable}
+                disabled={!playable}
+                onClick={playable ? onPlay : undefined}
+              />
+            </span>
           );
         })}
       </div>

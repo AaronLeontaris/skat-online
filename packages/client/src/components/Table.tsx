@@ -210,7 +210,13 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           <GameView snapshot={snapshot} round={round} connected={connected} emit={emit} />
 
           <div className="chat-footer">
-            <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} collapsible />
+            <Chat
+              messages={messages}
+              onSend={(text) => emit("chat:send", { text })}
+              onVoice={(sound, kind) => emit("sound:play", { sound, kind })}
+              disabled={!connected}
+              collapsible
+            />
           </div>
         </>
       ) : (
@@ -247,7 +253,12 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
               </p>
             </section>
           )}
-          <Chat messages={messages} onSend={(text) => emit("chat:send", { text })} disabled={!connected} />
+          <Chat
+            messages={messages}
+            onSend={(text) => emit("chat:send", { text })}
+            onVoice={(sound, kind) => emit("sound:play", { sound, kind })}
+            disabled={!connected}
+          />
         </div>
       )}
     </div>

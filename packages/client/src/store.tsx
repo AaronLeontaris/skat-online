@@ -12,6 +12,7 @@ import type { Socket } from "socket.io-client";
 import type { ClientToServer, User } from "@skat/shared";
 import { connectSocket, login as apiLogin, me as apiMe } from "./api";
 import type { ClientEventMap, ServerEventMap } from "./api";
+import { playSound } from "./sound";
 import {
   initialSessionState,
   loadStoredToken,
@@ -102,6 +103,7 @@ export function SessionProvider({ children }: { children: ReactNode }): JSX.Elem
     socket.on("snapshot", (snapshot) => dispatch({ type: "snapshot", snapshot }));
     socket.on("table:updated", (table) => dispatch({ type: "table", table }));
     socket.on("chat:message", (message) => dispatch({ type: "chat", message }));
+    socket.on("sound:play", (payload) => playSound(payload.sound, payload.kind));
     socket.on("error", (err) => dispatch({ type: "error", message: normalizeError(err) }));
 
     return () => {

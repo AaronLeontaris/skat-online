@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { ChatMessage } from "@skat/shared";
+import type { ChatMessage, SoundKind } from "@skat/shared";
 
 export interface ChatProps {
   messages: ChatMessage[];
@@ -7,6 +7,8 @@ export interface ChatProps {
   disabled?: boolean;
   /** Collapsible mode (floating launcher + badge); otherwise a normal open panel. */
   collapsible?: boolean;
+  /** Called when a voice-line button is pressed (plays the sound for the table). */
+  onVoice?: (sound: string, kind: SoundKind) => void;
 }
 
 function formatTime(iso: string): string {
@@ -16,7 +18,7 @@ function formatTime(iso: string): string {
 }
 
 /** Table chat: message list plus an input. In collapsible mode it is a floating launcher. */
-export function Chat({ messages, onSend, disabled, collapsible = false }: ChatProps): JSX.Element {
+export function Chat({ messages, onSend, disabled, collapsible = false, onVoice }: ChatProps): JSX.Element {
   const [open, setOpen] = useState(!collapsible);
   const [seenCount, setSeenCount] = useState(0);
   const [text, setText] = useState("");
@@ -75,6 +77,21 @@ export function Chat({ messages, onSend, disabled, collapsible = false }: ChatPr
           ))
         )}
       </ul>
+      {onVoice ? (
+        <div className="chat-voice">
+          <button
+            type="button"
+            className="voice-btn"
+            disabled={disabled}
+            onClick={() => {
+              onSend("Hallo!");
+              onVoice("hallo", "speech");
+            }}
+          >
+            👋 Hallo
+          </button>
+        </div>
+      ) : null}
       <form className="chat-form" onSubmit={submit}>
         <input
           type="text"

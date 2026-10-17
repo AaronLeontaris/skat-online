@@ -2,6 +2,7 @@ import type { Snapshot } from "@skat/shared";
 import { useSession } from "../store";
 import { declarationLabel, seatLabel, sidePoints } from "./gameHelpers";
 import { phaseLabel } from "./labels";
+import { SoundToggles } from "./SoundToggles";
 
 export interface GameHeaderProps {
   snapshot: Snapshot;
@@ -26,6 +27,7 @@ export function GameHeader({ snapshot, connected, onOpenProfile, onLeave }: Game
         <h1>{table.name}</h1>
         <div className="topbar-right">
           <img className="header-logo" src="/logo.png" alt="Logo" />
+          <SoundToggles />
           <span className={connected ? "badge" : "badge badge-muted"}>
             {connected ? "verbunden" : "offline"}
           </span>

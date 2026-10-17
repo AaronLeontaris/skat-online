@@ -212,6 +212,12 @@ label {
   flex-wrap: wrap;
 }
 
+.sound-toggle {
+  padding: 0.15rem 0.4rem;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
 .badge {
   display: inline-block;
   padding: 0.1rem 0.45rem;
@@ -901,6 +907,18 @@ label {
   white-space: nowrap;
 }
 
+.chat-voice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.voice-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.85rem;
+}
+
 .hand-footer {
   position: fixed;
   bottom: 1rem;
@@ -1081,6 +1099,22 @@ details.panel summary {
   flex-wrap: wrap;
   gap: 0.35rem;
   margin-top: 0.4rem;
+}
+
+.hand-deal {
+  display: inline-flex;
+  animation: deal-in 0.28s ease-out backwards;
+}
+
+@keyframes deal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .trick-row {

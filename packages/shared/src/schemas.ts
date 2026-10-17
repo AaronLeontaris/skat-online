@@ -49,6 +49,7 @@ export const clientPayloadSchemas: { [K in keyof ClientToServer]: z.ZodType<Clie
   "game:kontra": z.object({}).strict(),
   "game:re": z.object({}).strict(),
   "chat:send": z.object({ text: z.string().min(1).max(500) }),
+  "sound:play": z.object({ sound: z.string().min(1).max(40), kind: z.enum(["sound", "speech"]) }),
 };
 
 export { cardSchema, gameDeclarationSchema };
