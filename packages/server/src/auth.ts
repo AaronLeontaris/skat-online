@@ -88,7 +88,19 @@ export async function initUsers(): Promise<void> {
   }
 
   for (const acc of config.seedAccounts) {
-    if (byEmail.has(acc.email)) continue;
+    const existing = byEmail.get(acc.email);
+    if (existing) {
+      // Seeded accounts are trusted; keep them verified even after a schema migration.
+      if (!existing.email_verified) {
+        existing.email_verified = true;
+        if (dbOk) {
+          await pool
+            .query("UPDATE users SET email_verified = TRUE WHERE id = $1", [existing.id])
+            .catch(() => {});
+        }
+      }
+      continue;
+    }
     const u: UserRecord = {
       id: randomUUID(),
       email: acc.email,
