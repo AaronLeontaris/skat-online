@@ -109,8 +109,9 @@ export function login(email: string, password: string): Promise<LoginResult> {
   );
 }
 
-export function me(token: string): Promise<User> {
-  return request<User>("/api/auth/me", { method: "GET", headers: jsonHeaders(token) }, true);
+export async function me(token: string): Promise<User> {
+  const res = await request<{ user: User }>("/api/auth/me", { method: "GET", headers: jsonHeaders(token) }, true);
+  return res.user;
 }
 
 /** Uploads the file as a raw binary body with the file's own MIME type; response is `{ avatarUrl }`. */
@@ -127,20 +128,22 @@ export function uploadAvatar(token: string, file: File): Promise<{ avatarUrl?: s
   );
 }
 
-export function updateProfile(token: string, username: string): Promise<User> {
-  return request<User>(
+export async function updateProfile(token: string, username: string): Promise<User> {
+  const res = await request<{ user: User }>(
     "/api/profile",
     { method: "PATCH", headers: jsonHeaders(token), body: JSON.stringify({ username }) },
     true,
   );
+  return res.user;
 }
 
-export function updateDeckType(token: string, deckType: "normal" | "turnier"): Promise<User> {
-  return request<User>(
+export async function updateDeckType(token: string, deckType: "normal" | "turnier"): Promise<User> {
+  const res = await request<{ user: User }>(
     "/api/profile",
     { method: "PATCH", headers: jsonHeaders(token), body: JSON.stringify({ deckType }) },
     true,
   );
+  return res.user;
 }
 
 export function fetchTables(token: string): Promise<OpenTable[]> {
