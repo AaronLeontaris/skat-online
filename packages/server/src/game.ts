@@ -15,6 +15,7 @@ import {
   trumpModeFor,
 } from "@skat/engine";
 import type { CompletedTrick, Phase, PlayedCard, RoundResult } from "@skat/shared";
+import { recordRoundStats } from "./auth";
 import type { TableSession } from "./tables";
 
 export interface Bidding {
@@ -408,6 +409,12 @@ export function scoreRound(table: TableSession, round: RoundState): RoundResult 
   round.lastResult = result;
   round.phase = "roundEnd";
   table.status = "waiting";
+
+  // Persist per-player round statistics (best-effort, fire-and-forget).
+  for (const { seatIndex, delta } of result.deltas) {
+    const player = table.seats[seatIndex];
+    if (player) void recordRoundStats(player.userId, delta, table.settings.scoringMode);
+  }
 
   // Everyone is implicitly ready again for the next round.
   for (const seat of table.seats) {

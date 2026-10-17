@@ -297,10 +297,44 @@ label {
 
 /* Login / profile. */
 .login-panel {
-  width: min(360px, 90vw);
+  width: min(380px, 92vw);
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.login-tabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.login-tabs button {
+  flex: 1;
+}
+
+.info-text {
+  color: var(--accent);
+  font-size: 0.85rem;
+  margin: 0.3rem 0;
+}
+
+.ok-text {
+  color: var(--ok);
+  font-size: 0.95rem;
+  margin: 0.3rem 0;
+}
+
+.verify-link {
+  display: inline-block;
+  text-align: center;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: none;
+  margin-top: 0.4rem;
 }
 
 .profile-row {
@@ -395,6 +429,50 @@ label {
   border: 1px solid var(--border);
   border-radius: 2px;
   flex-wrap: wrap;
+}
+
+.leaderboard-list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: #241a10;
+}
+
+.leaderboard-rank {
+  width: 1.6rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--accent);
+  flex: none;
+}
+
+.leaderboard-name {
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+
+.leaderboard-games {
+  flex: none;
+}
+
+.leaderboard-avg {
+  flex: none;
+  min-width: 3.5rem;
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .join-seat {

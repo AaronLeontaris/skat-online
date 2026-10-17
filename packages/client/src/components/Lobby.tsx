@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import type { TableSettings } from "@skat/shared";
-import { fetchTables, type OpenTable } from "../api";
+import type { LeaderboardEntry, TableSettings } from "@skat/shared";
+import { fetchLeaderboard, fetchTables, type OpenTable } from "../api";
 import { useSession } from "../store";
+import { Leaderboard, type LeaderSortMode } from "./Leaderboard";
 import { SettingsForm } from "./SettingsForm";
 
 const SEAT_INDICES = [0, 1, 2, 3] as const;
@@ -39,6 +40,8 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const [settings, setSettings] = useState<TableSettings>(DEFAULT_SETTINGS);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [sortMode, setSortMode] = useState<LeaderSortMode>("traditional");
 
   const refresh = useCallback(async (): Promise<void> => {
     setLoading(true);
@@ -58,6 +61,19 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
     const timer = window.setInterval(() => void refresh(), 15000);
     return () => window.clearInterval(timer);
   }, [refresh]);
+
+  const refreshLeaderboard = useCallback(async (): Promise<void> => {
+    try {
+      const res = await fetchLeaderboard();
+      setLeaderboard(Array.isArray(res.entries) ? res.entries : []);
+    } catch {
+      // Leaderboard is best-effort; ignore errors.
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshLeaderboard();
+  }, [refreshLeaderboard]);
 
   function createTable(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
@@ -206,6 +222,32 @@ export function Lobby({ token, onOpenProfile }: LobbyProps): JSX.Element {
           )}
         </section>
       </div>
+
+      <section className="panel leaderboard-panel">
+        <div className="row space-between">
+          <h2>Bestenliste</h2>
+          <div className="row wrap">
+            <button
+              type="button"
+              className={sortMode === "traditional" ? "primary" : ""}
+              onClick={() => setSortMode("traditional")}
+            >
+              Traditionell
+            </button>
+            <button
+              type="button"
+              className={sortMode === "seegerFabian" ? "primary" : ""}
+              onClick={() => setSortMode("seegerFabian")}
+            >
+              Seeger-Fabian
+            </button>
+            <button type="button" onClick={() => void refreshLeaderboard()} title="Aktualisieren">
+              ↻
+            </button>
+          </div>
+        </div>
+        <Leaderboard entries={leaderboard} sortMode={sortMode} />
+      </section>
     </div>
   );
 }

@@ -12,10 +12,12 @@ export interface Config {
   nodeEnv: string;
   jwtSecret: string;
   clientOrigin: string;
+  appUrl: string;
   postgres: { host: string; port: number; database: string; user: string; password: string };
   redis: { host: string; port: number };
   uploadDir: string;
   maxUploadMb: number;
+  smtp: { host: string | null; port: number; user: string | null; pass: string | null; from: string };
   seedAccounts: { email: string; password: string; username: string }[];
 }
 
@@ -41,6 +43,7 @@ export const config: Config = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   jwtSecret: process.env.JWT_SECRET ?? "dev-secret-change-me",
   clientOrigin: process.env.CLIENT_ORIGIN ?? "http://localhost:5173",
+  appUrl: process.env.APP_URL ?? process.env.CLIENT_ORIGIN ?? "http://localhost:5173",
   postgres: {
     host: process.env.POSTGRES_HOST ?? "localhost",
     port: int(process.env.POSTGRES_PORT, 5432),
@@ -54,5 +57,12 @@ export const config: Config = {
   },
   uploadDir: process.env.UPLOAD_DIR ?? "./uploads",
   maxUploadMb: int(process.env.MAX_UPLOAD_MB, 8),
+  smtp: {
+    host: process.env.SMTP_HOST ?? null,
+    port: int(process.env.SMTP_PORT, 587),
+    user: process.env.SMTP_USER ?? null,
+    pass: process.env.SMTP_PASS ?? null,
+    from: process.env.SMTP_FROM ?? "Skat Online <noreply@skat.boo>",
+  },
   seedAccounts: parseSeed(process.env.SEED_ACCOUNTS ?? ""),
 };

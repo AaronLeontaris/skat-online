@@ -5,8 +5,14 @@ import { Lobby } from "./components/Lobby";
 import { Profile } from "./components/Profile";
 import { Splash } from "./components/Splash";
 import { Table } from "./components/Table";
+import { Verify } from "./components/Verify";
 
 type Screen = "lobby" | "profile";
+
+function getVerifyToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return new URLSearchParams(window.location.search).get("verify");
+}
 
 function AppContent(): JSX.Element {
   const { user, token, snapshot, error, loading, setUser, setError, signOut } = useSession();
@@ -63,11 +69,16 @@ function AppContent(): JSX.Element {
 /** Root component: session provider plus a tiny screen switch. */
 export function App(): JSX.Element {
   const [splash, setSplash] = useState(true);
+  const verifyToken = getVerifyToken();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setSplash(false), 2200);
     return () => window.clearTimeout(timer);
   }, []);
+
+  if (verifyToken) {
+    return <Verify token={verifyToken} />;
+  }
 
   return (
     <>

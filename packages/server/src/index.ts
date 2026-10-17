@@ -4,7 +4,7 @@ import express from "express";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Server } from "socket.io";
-import { authRouter, initUsers } from "./auth";
+import { authRouter, getLeaderboard, initUsers } from "./auth";
 import { config } from "./config";
 import { initDb } from "./db";
 import { createMediaRouter } from "./media";
@@ -34,6 +34,10 @@ async function main(): Promise<void> {
 
   app.get("/api/tables", (_req, res) => {
     res.json(store.openTables().map(buildTablePublic));
+  });
+
+  app.get("/api/leaderboard", (_req, res) => {
+    res.json({ entries: getLeaderboard() });
   });
 
   // Serve the built client (SPA) in production; skipped when dist/ is absent (dev).

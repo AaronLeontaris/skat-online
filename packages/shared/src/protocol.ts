@@ -23,6 +23,18 @@ export interface User {
   avatarUrl: string | null;
 }
 
+/** One row of the persistent leaderboard. */
+export interface LeaderboardEntry {
+  userId: string;
+  username: string;
+  avatarUrl: string | null;
+  gamesPlayed: number;
+  /** Average points per round (traditional), or null if none played. */
+  traditionalAvg: number | null;
+  /** Average points per round (Seeger-Fabian), or null if none played. */
+  seegerAvg: number | null;
+}
+
 export interface PublicPlayer {
   userId: string;
   username: string;

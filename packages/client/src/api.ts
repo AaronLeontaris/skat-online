@@ -1,5 +1,5 @@
 import { io, type Socket } from "socket.io-client";
-import type { User } from "@skat/shared";
+import type { LeaderboardEntry, User } from "@skat/shared";
 import type { ClientToServer, ServerToClient } from "@skat/shared";
 
 /**
@@ -137,6 +137,26 @@ export function updateProfile(token: string, username: string): Promise<User> {
 
 export function fetchTables(token: string): Promise<OpenTable[]> {
   return request<OpenTable[]>("/api/tables", { method: "GET", headers: jsonHeaders(token) }, true);
+}
+
+export function register(email: string, password: string, username: string): Promise<{ ok: boolean; email?: string }> {
+  return request<{ ok: boolean; email?: string }>(
+    "/api/auth/register",
+    { method: "POST", headers: jsonHeaders(), body: JSON.stringify({ email, password, username }) },
+    true,
+  );
+}
+
+export function verifyEmail(token: string): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(
+    "/api/auth/verify",
+    { method: "POST", headers: jsonHeaders(), body: JSON.stringify({ token }) },
+    true,
+  );
+}
+
+export function fetchLeaderboard(): Promise<{ entries: LeaderboardEntry[] }> {
+  return request<{ entries: LeaderboardEntry[] }>("/api/leaderboard", { method: "GET", headers: jsonHeaders() }, true);
 }
 
 /**
