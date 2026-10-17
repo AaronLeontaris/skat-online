@@ -18,6 +18,10 @@ function AppContent(): JSX.Element {
   const { user, token, snapshot, error, loading, setUser, setError, signOut } = useSession();
   const [screen, setScreen] = useState<Screen>("lobby");
 
+  useEffect(() => {
+    document.body.classList.toggle("deck-turnier", user?.deckType === "turnier");
+  }, [user?.deckType]);
+
   if (!user || !token) {
     if (loading) {
       return (

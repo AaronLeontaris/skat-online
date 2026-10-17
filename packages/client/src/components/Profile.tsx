@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import type { User } from "@skat/shared";
-import { updateProfile, uploadAvatar } from "../api";
+import { updateDeckType, updateProfile, uploadAvatar } from "../api";
 import { Avatar } from "./Avatar";
 
 export interface ProfileProps {
@@ -55,6 +55,19 @@ export function Profile({ user, token, onUserUpdated, onError }: ProfileProps): 
     }
   }
 
+  async function onDeckTypeChange(deckType: "normal" | "turnier"): Promise<void> {
+    setBusy(true);
+    onError(null);
+    try {
+      const updated = await updateDeckType(token, deckType);
+      if (updated) onUserUpdated(updated);
+    } catch (err) {
+      onError(err instanceof Error ? err.message : "Deck konnte nicht geändert werden.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="panel">
       <h2>Profil</h2>
@@ -88,6 +101,29 @@ export function Profile({ user, token, onUserUpdated, onError }: ProfileProps): 
           </button>
         </div>
       </form>
+
+      <div className="profile-deck">
+        <span className="group-label">Kartendeck</span>
+        <div className="row">
+          <button
+            type="button"
+            className={user.deckType !== "turnier" ? "primary" : ""}
+            disabled={busy}
+            onClick={() => void onDeckTypeChange("normal")}
+          >
+            Normal
+          </button>
+          <button
+            type="button"
+            className={user.deckType === "turnier" ? "primary" : ""}
+            disabled={busy}
+            onClick={() => void onDeckTypeChange("turnier")}
+          >
+            Turnier
+          </button>
+        </div>
+        <p className="muted small">Turnier-Deck: vierfarbige Karten (Karo orange, Pik grün).</p>
+      </div>
     </section>
   );
 }

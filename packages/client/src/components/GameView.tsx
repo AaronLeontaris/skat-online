@@ -159,6 +159,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             hand={self.hand}
             legalPlays={self.legalPlays}
             ownerName={seatLabel(seats, self.seatIndex)}
+            declaration={round.declaration}
             onPlay={(card) => emit("game:playCard", { card })}
           />
         </div>

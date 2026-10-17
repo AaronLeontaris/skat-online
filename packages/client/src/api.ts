@@ -135,6 +135,14 @@ export function updateProfile(token: string, username: string): Promise<User> {
   );
 }
 
+export function updateDeckType(token: string, deckType: "normal" | "turnier"): Promise<User> {
+  return request<User>(
+    "/api/profile",
+    { method: "PATCH", headers: jsonHeaders(token), body: JSON.stringify({ deckType }) },
+    true,
+  );
+}
+
 export function fetchTables(token: string): Promise<OpenTable[]> {
   return request<OpenTable[]>("/api/tables", { method: "GET", headers: jsonHeaders(token) }, true);
 }

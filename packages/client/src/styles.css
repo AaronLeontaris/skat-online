@@ -377,6 +377,16 @@ label {
   max-width: 420px;
 }
 
+.profile-deck {
+  border-top: 1px dashed var(--border);
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 420px;
+}
+
 .file-label {
   display: inline-flex;
   flex-direction: column;
@@ -814,6 +824,23 @@ label {
   padding: 0.4rem 0.6rem;
 }
 
+.trick-last-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.1rem 0.3rem;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.trick-last-toggle:hover {
+  color: var(--accent);
+}
+
 .game-panels {
   display: flex;
   gap: 1rem;
@@ -1073,6 +1100,31 @@ details.panel summary {
 
 .card-red {
   color: var(--red);
+}
+
+/* Normal deck: two colors. */
+.card-suit-clubs,
+.card-suit-spades {
+  color: #14181d;
+}
+
+.card-suit-hearts,
+.card-suit-diamonds {
+  color: #c8102e;
+}
+
+/* Turnier deck: four colors (Karo orange, Pik green). */
+.deck-turnier .card-suit-clubs {
+  color: #101010;
+}
+.deck-turnier .card-suit-spades {
+  color: #1a7f37;
+}
+.deck-turnier .card-suit-hearts {
+  color: #d23c2f;
+}
+.deck-turnier .card-suit-diamonds {
+  color: #d98c00;
 }
 
 .card-playable {

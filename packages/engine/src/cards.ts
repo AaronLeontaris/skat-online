@@ -1,4 +1,4 @@
-import type { Card, Rank, Suit } from "./types";
+import type { Card, GameDeclaration, Rank, Suit } from "./types";
 
 export const SUITS: readonly Suit[] = ["clubs", "spades", "hearts", "diamonds"];
 export const RANKS: readonly Rank[] = ["7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -80,6 +80,33 @@ export function sortHand(cards: readonly Card[]): Card[] {
   const suitOrder = (s: Suit) => SUITS.indexOf(s);
   const rankOrder = (r: Rank) => SUIT_GAME_ORDER.indexOf(r);
   return [...cards].sort((a, b) => {
+    if (suitOrder(a.suit) !== suitOrder(b.suit)) return suitOrder(a.suit) - suitOrder(b.suit);
+    return rankOrder(b.rank) - rankOrder(a.rank);
+  });
+}
+
+/**
+ * Display sort for a declared game: trumps first (strongest left), then the rest
+ * by suit and value. For Grand only jacks are trumps; for a suit game jacks then
+ * the trump suit. Null keeps the natural sort.
+ */
+export function sortHandForGame(cards: readonly Card[], declaration: GameDeclaration | null): Card[] {
+  if (!declaration || declaration.kind === "null") return sortHand(cards);
+
+  const trumpSuit: Suit | null = declaration.kind === "suit" ? declaration.suit ?? null : null;
+  const isTrumpCard = (c: Card): boolean => c.rank === "J" || (trumpSuit !== null && c.suit === trumpSuit);
+  const trumpValue = (c: Card): number => {
+    if (c.rank === "J") return 200 + (JACK_ORDER.length - JACK_ORDER.indexOf(c.suit));
+    return 100 - SUIT_GAME_ORDER.indexOf(c.rank);
+  };
+  const suitOrder = (s: Suit) => SUITS.indexOf(s);
+  const rankOrder = (r: Rank) => SUIT_GAME_ORDER.indexOf(r);
+
+  return [...cards].sort((a, b) => {
+    const aTrump = isTrumpCard(a);
+    const bTrump = isTrumpCard(b);
+    if (aTrump !== bTrump) return aTrump ? -1 : 1;
+    if (aTrump && bTrump) return trumpValue(b) - trumpValue(a);
     if (suitOrder(a.suit) !== suitOrder(b.suit)) return suitOrder(a.suit) - suitOrder(b.suit);
     return rankOrder(b.rank) - rankOrder(a.rank);
   });

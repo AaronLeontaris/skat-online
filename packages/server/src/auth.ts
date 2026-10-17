@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "node:crypto";
 import type { User, LeaderboardEntry } from "@skat/shared";
+import type { DeckType } from "@skat/shared";
 import type { ScoringMode } from "@skat/engine";
 import { config } from "./config";
 import { dbOk, pool } from "./db";
@@ -15,6 +16,7 @@ interface UserRecord {
   password_hash: string;
   username: string;
   avatar_url: string | null;
+  deck_type: DeckType;
   email_verified: boolean;
   verification_token: string | null;
   games_played: number;
@@ -29,7 +31,7 @@ const byId = new Map<string, UserRecord>();
 const byEmail = new Map<string, UserRecord>();
 
 function toPublic(u: UserRecord): User {
-  return { id: u.id, email: u.email, username: u.username, avatarUrl: u.avatar_url };
+  return { id: u.id, email: u.email, username: u.username, avatarUrl: u.avatar_url, deckType: u.deck_type };
 }
 
 async function persistInsert(u: UserRecord): Promise<void> {
@@ -61,7 +63,7 @@ export async function initUsers(): Promise<void> {
   if (dbOk) {
     try {
       const { rows } = await pool.query(
-        `SELECT id, email, password_hash, username, avatar_url, email_verified, verification_token,
+        `SELECT id, email, password_hash, username, avatar_url, deck_type, email_verified, verification_token,
            games_played, traditional_sum, traditional_rounds, seeger_sum, seeger_rounds FROM users`,
       );
       for (const r of rows) {
@@ -71,6 +73,7 @@ export async function initUsers(): Promise<void> {
           password_hash: r.password_hash,
           username: r.username,
           avatar_url: r.avatar_url,
+          deck_type: r.deck_type === "turnier" ? "turnier" : "normal",
           email_verified: r.email_verified ?? false,
           verification_token: r.verification_token ?? null,
           games_played: r.games_played ?? 0,
@@ -107,6 +110,7 @@ export async function initUsers(): Promise<void> {
       password_hash: await bcrypt.hash(acc.password, 10),
       username: acc.username,
       avatar_url: null,
+      deck_type: "normal",
       email_verified: true, // pre-seeded accounts are trusted
       verification_token: null,
       games_played: 0,
@@ -153,6 +157,7 @@ export async function registerUser(email: string, password: string, username: st
     password_hash: await bcrypt.hash(password, 10),
     username,
     avatar_url: null,
+    deck_type: "normal",
     email_verified: false,
     verification_token: randomUUID(),
     games_played: 0,
@@ -235,6 +240,16 @@ export async function updateUsername(id: string, username: string): Promise<User
   u.username = username;
   if (dbOk) {
     await pool.query("UPDATE users SET username = $1 WHERE id = $2", [username, id]).catch(() => {});
+  }
+  return toPublic(u);
+}
+
+export async function updateDeckType(id: string, deckType: DeckType): Promise<User | null> {
+  const u = byId.get(id);
+  if (!u) return null;
+  u.deck_type = deckType;
+  if (dbOk) {
+    await pool.query("UPDATE users SET deck_type = $1 WHERE id = $2", [deckType, id]).catch(() => {});
   }
   return toPublic(u);
 }

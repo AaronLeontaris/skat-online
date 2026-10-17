@@ -29,6 +29,7 @@ export async function initDb(): Promise<void> {
           password_hash TEXT NOT NULL,
           username TEXT NOT NULL,
           avatar_url TEXT,
+          deck_type TEXT NOT NULL DEFAULT 'normal',
           email_verified BOOLEAN NOT NULL DEFAULT FALSE,
           verification_token TEXT,
           games_played INTEGER NOT NULL DEFAULT 0,
@@ -47,6 +48,7 @@ export async function initDb(): Promise<void> {
       await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS traditional_rounds INTEGER NOT NULL DEFAULT 0`);
       await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS seeger_sum INTEGER NOT NULL DEFAULT 0`);
       await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS seeger_rounds INTEGER NOT NULL DEFAULT 0`);
+      await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS deck_type TEXT NOT NULL DEFAULT 'normal'`);
       await pool.query(`
         CREATE TABLE IF NOT EXISTS chat_messages (
           id TEXT PRIMARY KEY,

@@ -16,11 +16,14 @@ export interface TableSettings {
   scoringMode: ScoringMode;
 }
 
+export type DeckType = "normal" | "turnier";
+
 export interface User {
   id: string;
   email: string;
   username: string;
   avatarUrl: string | null;
+  deckType: DeckType;
 }
 
 /** One row of the persistent leaderboard. */

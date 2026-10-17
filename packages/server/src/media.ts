@@ -5,7 +5,7 @@ import express from "express";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import sharp from "sharp";
-import { updateAvatar, updateUsername, verifyToken } from "./auth";
+import { updateAvatar, updateDeckType, updateUsername, verifyToken } from "./auth";
 import { config } from "./config";
 import { sync } from "./socket";
 import type { TableStore } from "./tables";
@@ -64,13 +64,23 @@ export function createMediaRouter(store: TableStore, io: Server): Router {
       res.status(401).json({ error: "Nicht angemeldet" });
       return;
     }
-    const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
-    if (username.length < 1 || username.length > 30) {
+    const username = typeof req.body?.username === "string" ? req.body.username.trim() : null;
+    const deckType = typeof req.body?.deckType === "string" ? req.body.deckType : null;
+
+    if (username !== null && (username.length < 1 || username.length > 30)) {
       res.status(400).json({ error: "Ungültiger Benutzername" });
       return;
     }
-    const user = await updateUsername(userId, username);
-    if (user) {
+    if (deckType !== null && deckType !== "normal" && deckType !== "turnier") {
+      res.status(400).json({ error: "Ungültiges Deck" });
+      return;
+    }
+
+    let user = null;
+    if (username !== null) user = await updateUsername(userId, username);
+    if (deckType !== null) user = await updateDeckType(userId, deckType);
+
+    if (user && username !== null) {
       const table = store.tableOfUser(userId);
       if (table) {
         store.updateSeatProfile(table, userId, user.username, user.avatarUrl);

@@ -1,5 +1,6 @@
-import type { Card } from "@skat/engine";
-import { CardView, cardKey, sortCards } from "./CardView";
+import type { Card, GameDeclaration } from "@skat/engine";
+import { sortHandForGame } from "@skat/engine";
+import { CardView, cardKey } from "./CardView";
 
 export interface HandViewProps {
   /** Own cards; empty for spectators and seated-out players. */
@@ -9,11 +10,13 @@ export interface HandViewProps {
   onPlay: (card: Card) => void;
   /** Player name shown in the heading. */
   ownerName: string;
+  /** Current declaration (used to sort trumps left). */
+  declaration?: GameDeclaration | null;
 }
 
 /** The player's own hand. Cards are clickable only when legally playable. */
-export function HandView({ hand, legalPlays, onPlay, ownerName }: HandViewProps): JSX.Element {
-  const sorted = sortCards(hand);
+export function HandView({ hand, legalPlays, onPlay, ownerName, declaration = null }: HandViewProps): JSX.Element {
+  const sorted = sortHandForGame(hand, declaration);
   const playableKeys = new Set((legalPlays ?? []).map(cardKey));
 
   if (sorted.length === 0) {

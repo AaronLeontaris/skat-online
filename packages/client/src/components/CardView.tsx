@@ -59,7 +59,7 @@ export interface CardViewProps {
 /** Minimal text card: rank + suit symbol in a bordered square, red or black. */
 export function CardView({ card, selected, playable, disabled, onClick, title }: CardViewProps): JSX.Element {
   const classes = ["card"];
-  classes.push(isRedSuit(card.suit) ? "card-red" : "card-black");
+  classes.push(`card-suit-${card.suit}`);
   if (selected) classes.push("card-selected");
   if (playable && !disabled) classes.push("card-playable");
   if (disabled) classes.push("card-disabled");

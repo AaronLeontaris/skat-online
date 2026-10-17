@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { CompletedTrick, PlayedCard, PublicPlayer } from "@skat/shared";
 import { CardView, cardKey } from "./CardView";
 
@@ -12,9 +13,10 @@ export interface TrickViewProps {
   seats: readonly (PublicPlayer | null)[];
 }
 
-/** The current trick centered on the table, plus the most recent completed Stich. */
+/** The current trick centered on the table; the last Stich is hidden until clicked. */
 export function TrickView({ currentTrick, completedTricks, seats }: TrickViewProps): JSX.Element {
   const last = completedTricks.length > 0 ? completedTricks[completedTricks.length - 1] : null;
+  const [showLast, setShowLast] = useState(false);
 
   return (
     <div className="trick-view">
@@ -33,14 +35,20 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
 
       {last !== null ? (
         <div className="trick-last">
-          <span className="muted small">
-            Letzter Stich: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length} Stiche
-          </span>
-          <div className="trick-cards">
-            {last.cards.map((played) => (
-              <CardView key={cardKey(played.card)} card={played.card} disabled />
-            ))}
-          </div>
+          <button type="button" className="trick-last-toggle" onClick={() => setShowLast((v) => !v)}>
+            <span>
+              Letzter Stich: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length}{" "}
+              {completedTricks.length === 1 ? "Stich" : "Stiche"}
+            </span>
+            <span aria-hidden="true">{showLast ? "▾" : "▸"}</span>
+          </button>
+          {showLast ? (
+            <div className="trick-cards">
+              {last.cards.map((played) => (
+                <CardView key={cardKey(played.card)} card={played.card} disabled />
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
