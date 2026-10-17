@@ -183,6 +183,20 @@ export async function verifyEmail(token: string): Promise<boolean> {
   return false;
 }
 
+export type ResendResult = { ok: true; email: string; verificationToken: string } | { ok: false };
+
+export async function resendVerification(email: string): Promise<ResendResult> {
+  const u = byEmail.get(email.trim().toLowerCase());
+  if (!u || u.email_verified) return { ok: false };
+  u.verification_token = randomUUID();
+  if (dbOk) {
+    await pool
+      .query("UPDATE users SET verification_token = $1 WHERE id = $2", [u.verification_token, u.id])
+      .catch(() => {});
+  }
+  return { ok: true, email: u.email, verificationToken: u.verification_token };
+}
+
 export async function recordRoundStats(userId: string, delta: number, scoringMode: ScoringMode): Promise<void> {
   const u = byId.get(userId);
   if (!u) return;
@@ -305,6 +319,16 @@ authRouter.post("/verify", async (req: Request, res: Response) => {
     res.status(400).json({ error: "Ungültiger oder abgelaufener Bestätigungslink." });
     return;
   }
+  res.json({ ok: true });
+});
+
+authRouter.post("/resend-verification", async (req: Request, res: Response) => {
+  const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const result = await resendVerification(email);
+  if (result.ok) {
+    await sendVerificationEmail(result.email, result.verificationToken);
+  }
+  // Always respond ok to avoid leaking whether the address exists.
   res.json({ ok: true });
 });
 

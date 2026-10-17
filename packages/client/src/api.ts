@@ -155,6 +155,14 @@ export function verifyEmail(token: string): Promise<{ ok: boolean }> {
   );
 }
 
+export function resendVerification(email: string): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>(
+    "/api/auth/resend-verification",
+    { method: "POST", headers: jsonHeaders(), body: JSON.stringify({ email }) },
+    true,
+  );
+}
+
 export function fetchLeaderboard(): Promise<{ entries: LeaderboardEntry[] }> {
   return request<{ entries: LeaderboardEntry[] }>("/api/leaderboard", { method: "GET", headers: jsonHeaders() }, true);
 }

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { ApiError, login as apiLogin, register as apiRegister } from "../api";
+import { ApiError, login as apiLogin, register as apiRegister, resendVerification } from "../api";
 import { useSession } from "../store";
 
 /** Email + password sign-in / sign-up against the auth API. */
@@ -11,6 +11,8 @@ export function Login(): JSX.Element {
   const [username, setUsername] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [registered, setRegistered] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
   const [busy, setBusy] = useState(false);
 
   function switchMode(next: "login" | "register"): void {
@@ -46,6 +48,20 @@ export function Login(): JSX.Element {
     }
   }
 
+  async function resend(): Promise<void> {
+    if (registered === null || resending) return;
+    setResending(true);
+    setResent(false);
+    try {
+      await resendVerification(registered);
+      setResent(true);
+    } catch {
+      setResent(false);
+    } finally {
+      setResending(false);
+    }
+  }
+
   if (registered !== null) {
     return (
       <div className="screen screen-center">
@@ -59,9 +75,15 @@ export function Login(): JSX.Element {
             Bitte öffne den Link in der E-Mail, um dein Konto zu aktivieren. Falls du keine E-Mail siehst, wirf auch einen
             Blick in deinen Spam-Ordner.
           </p>
-          <button type="button" onClick={() => setRegistered(null)}>
-            Zurück zur Anmeldung
-          </button>
+          {resent ? <p className="ok-text">E-Mail erneut gesendet!</p> : null}
+          <div className="row login-actions">
+            <button type="button" onClick={resend} disabled={resending}>
+              {resending ? "Sende…" : "E-Mail erneut senden"}
+            </button>
+            <button type="button" onClick={() => setRegistered(null)}>
+              Zurück zur Anmeldung
+            </button>
+          </div>
         </div>
       </div>
     );

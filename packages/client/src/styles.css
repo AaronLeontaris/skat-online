@@ -346,6 +346,11 @@ label {
   margin: 0.25rem 0 0.5rem;
 }
 
+.login-actions {
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
 .profile-row {
   display: flex;
   gap: 1rem;
