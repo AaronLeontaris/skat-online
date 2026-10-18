@@ -818,9 +818,13 @@ label {
 
 .trick-current {
   display: flex;
-  gap: 0.6rem;
+  gap: 0;
   justify-content: center;
-  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.trick-current .trick-card + .trick-card {
+  margin-left: -1.5rem;
 }
 
 .trick-last {
@@ -1180,8 +1184,12 @@ details.panel summary {
 }
 
 .card-disabled {
-  opacity: 0.85;
   cursor: default;
+}
+
+/* Unplayable hand cards: darken the color instead of making them translucent. */
+.hand .card.card-disabled {
+  filter: brightness(0.6) saturate(0.7);
 }
 
 .hand {
