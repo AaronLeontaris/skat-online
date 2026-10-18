@@ -105,11 +105,13 @@ export function opponentTricks(r: PlayResult): number {
 }
 
 export function isSchneider(r: PlayResult): boolean {
-  return opponentPoints(r) <= 30;
+  // Schneider applies to either side: opponents ≤ 30 OR declarer ≤ 30.
+  return opponentPoints(r) <= 30 || r.declarerPoints <= 30;
 }
 
 export function isSchwarz(r: PlayResult): boolean {
-  return opponentTricks(r) === 0;
+  // Schwarz applies to either side: opponents won no tricks OR declarer won no tricks.
+  return opponentTricks(r) === 0 || r.declarerTricks === 0;
 }
 
 export function hasWonSolo(r: PlayResult): boolean {

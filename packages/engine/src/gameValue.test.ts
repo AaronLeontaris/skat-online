@@ -165,4 +165,11 @@ describe("computeSoloValue", () => {
     // 1 + 1 (matador) + 1 (hand) + 1 (schneider) + 1 (schwarz) = 5 → 120.
     expect(computeSoloValue(r, 1)).toBe(120);
   });
+
+  it("counts schneider/schwarz when the declarer side loses badly", () => {
+    // Grand mit 1, declarer took 0 points and 0 tricks → declarer is schneider AND schwarz.
+    const r = { declaration: decl({ kind: "grand" }), declarerPoints: 0, declarerTricks: 0 };
+    // 1 + 1 (matador) + 1 (schneider) + 1 (schwarz) = 4 → 96.
+    expect(computeSoloValue(r, 1)).toBe(96);
+  });
 });
