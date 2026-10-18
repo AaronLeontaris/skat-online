@@ -70,7 +70,8 @@ export interface RoundResult {
 /** Live state of the say/respond bidding, present only during the bidding phase. */
 export interface BiddingState {
   sayerSeat: SeatIndex;
-  listenerSeat: SeatIndex;
+  /** Null while the last remaining player decides alone (bid or pass → Ramsch). */
+  listenerSeat: SeatIndex | null;
   /** Last value the listener accepted, or null before the first hold. */
   heldValue: number | null;
   /** Value the sayer proposed and is awaiting the listener's decision on, or null. */

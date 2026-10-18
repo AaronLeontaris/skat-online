@@ -99,8 +99,11 @@ export function GameHeader({ snapshot, connected, onOpenProfile, onLeave }: Game
           </dl>
           {round.bidding ? (
             <p className="muted small">
-              Bieten: {seatLabel(seats, round.bidding.sayerSeat)} sagt gegen{" "}
-              {seatLabel(seats, round.bidding.listenerSeat)} · gehalten: {round.bidding.heldValue ?? "–"}
+              Bieten: {seatLabel(seats, round.bidding.sayerSeat)}{" "}
+              {round.bidding.listenerSeat === null
+                ? "kann bieten oder passen (Ramsch)"
+                : `sagt gegen ${seatLabel(seats, round.bidding.listenerSeat)}`}{" "}
+              · gehalten: {round.bidding.heldValue ?? "–"}
               {round.bidding.pendingRaise !== null ? ` · Gebot: ${round.bidding.pendingRaise}` : ""}
             </p>
           ) : null}

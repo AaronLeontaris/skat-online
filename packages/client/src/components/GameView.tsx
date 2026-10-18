@@ -187,10 +187,13 @@ function Controls({ round, selfSeat, hand, seats, disabled, emit }: ControlsProp
     if (selfSeat === sayerSeat && myTurn) {
       const base = pendingRaise ?? heldValue ?? 0;
       const next = nextBidValue(base);
+      const lastChance = listenerSeat === null;
       return (
         <section className="panel controls">
           <h3>Bieten</h3>
-          <p className="muted small">Du bist dran.</p>
+          <p className="muted small">
+            {lastChance ? "Alle anderen haben gepasst – biete oder passe (Ramsch)." : "Du bist dran."}
+          </p>
           <div className="row wrap">
             {next === null ? (
               <span className="muted small">Höchstes Gebot erreicht.</span>
@@ -200,7 +203,7 @@ function Controls({ round, selfSeat, hand, seats, disabled, emit }: ControlsProp
               </button>
             )}
             <button type="button" disabled={disabled} onClick={() => emit("game:bid", { pass: true })}>
-              Passen
+              {lastChance ? "Passen (Ramsch)" : "Passen"}
             </button>
           </div>
         </section>
@@ -232,7 +235,9 @@ function Controls({ round, selfSeat, hand, seats, disabled, emit }: ControlsProp
       <section className="panel controls">
         <h3>Bieten</h3>
         <p className="muted small">
-          {seatLabel(seats, sayerSeat)} sagt gegen {seatLabel(seats, listenerSeat)}.
+          {listenerSeat === null
+            ? `${seatLabel(seats, sayerSeat)} kann bieten oder passen (Ramsch).`
+            : `${seatLabel(seats, sayerSeat)} sagt gegen ${seatLabel(seats, listenerSeat)}.`}
         </p>
       </section>
     );

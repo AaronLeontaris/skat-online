@@ -20,7 +20,8 @@ import type { TableSession } from "./tables";
 
 export interface Bidding {
   sayerSeat: SeatIndex;
-  listenerSeat: SeatIndex;
+  /** Null while the last remaining player decides alone (bid or pass → Ramsch). */
+  listenerSeat: SeatIndex | null;
   heldValue: number | null;
   pendingRaise: number | null;
 }
@@ -161,28 +162,49 @@ export function applyBid(
   if (seat !== currentSeat) return { ok: false, error: "Du bist nicht am Zug" };
 
   if (sayerTurn) {
+    // --- Sayer's turn: bid the next value or pass. ---
     if (payload.pass) {
       if (round.biddingPhase === 1) {
+        // First sayer passes: the listener takes over against the third player.
         round.biddingPhase = 2;
         round.bidding = {
-          sayerSeat: b.listenerSeat,
+          sayerSeat: b.listenerSeat!,
           listenerSeat: round.activeSeats[2],
           heldValue: b.heldValue,
           pendingRaise: null,
         };
         return { ok: true, allPassed: false };
       }
-      const allPassed = finishBidding(round, b.listenerSeat);
+      if (b.heldValue === null && b.listenerSeat !== null) {
+        // Two players passed with no bid: the last player gets one chance to bid or pass (→ Ramsch).
+        round.bidding = {
+          sayerSeat: b.listenerSeat,
+          listenerSeat: null,
+          heldValue: null,
+          pendingRaise: null,
+        };
+        return { ok: true, allPassed: false };
+      }
+      // Last-chance pass (listenerSeat === null) or a held bid was declined.
+      const allPassed = finishBidding(round, b.listenerSeat ?? b.sayerSeat);
       return { ok: true, allPassed };
     }
     if (typeof payload.value !== "number" || !isNextBidValue(b.heldValue ?? 0, payload.value)) {
       return { ok: false, error: "Ungültiger Reizwert" };
     }
+    if (b.listenerSeat === null) {
+      // Last player's bid: they become the declarer immediately.
+      round.bidding = null;
+      round.declarerSeat = b.sayerSeat;
+      round.bidValue = payload.value;
+      round.phase = "skat";
+      return { ok: true, allPassed: false };
+    }
     round.bidding = { ...b, pendingRaise: payload.value };
     return { ok: true, allPassed: false };
   }
 
-  // Listener turn: hold or pass.
+  // --- Listener's turn: hold (acknowledge) or pass. ---
   if (payload.pass) {
     const held = b.pendingRaise!;
     if (round.biddingPhase === 1) {
@@ -200,6 +222,7 @@ export function applyBid(
     return { ok: true, allPassed };
   }
   if (payload.value === b.pendingRaise) {
+    // Listener holds the current bid.
     round.bidding = { ...b, heldValue: b.pendingRaise, pendingRaise: null };
     return { ok: true, allPassed: false };
   }
