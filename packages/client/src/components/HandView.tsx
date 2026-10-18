@@ -19,11 +19,14 @@ export function HandView({ hand, legalPlays, onPlay, declaration = null }: HandV
 
   if (sorted.length === 0) return null;
 
+  const mid = (sorted.length - 1) / 2;
+
   return (
     <section className="panel hand-view">
       <div className="hand">
         {sorted.map((card, index) => {
           const playable = playableKeys.has(cardKey(card));
+          const angle = (index - mid) * 4;
           return (
             <span key={cardKey(card)} className="hand-deal" style={{ animationDelay: `${index * 45}ms` }}>
               <CardView
@@ -31,6 +34,7 @@ export function HandView({ hand, legalPlays, onPlay, declaration = null }: HandV
                 playable={playable}
                 disabled={!playable}
                 onClick={playable ? onPlay : undefined}
+                style={{ transform: `rotate(${angle}deg)` }}
               />
             </span>
           );

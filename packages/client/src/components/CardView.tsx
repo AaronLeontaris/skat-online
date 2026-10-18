@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Card, Rank, Suit } from "@skat/engine";
 import { SUIT_LABEL_DE, SUIT_SYMBOL, sortHand } from "@skat/engine";
 
@@ -54,28 +55,42 @@ export interface CardViewProps {
   disabled?: boolean;
   onClick?: (card: Card) => void;
   title?: string;
+  style?: CSSProperties;
 }
 
-/** Minimal text card: rank + suit symbol in a bordered square, red or black. */
-export function CardView({ card, selected, playable, disabled, onClick, title }: CardViewProps): JSX.Element {
+/** Playing card: corner values (top-left + rotated bottom-right) and a large center value. */
+export function CardView({ card, selected, playable, disabled, onClick, title, style }: CardViewProps): JSX.Element {
   const classes = ["card"];
   classes.push(`card-suit-${card.suit}`);
   if (selected) classes.push("card-selected");
   if (playable && !disabled) classes.push("card-playable");
   if (disabled) classes.push("card-disabled");
   const clickable = Boolean(onClick) && !disabled;
+  const rank = RANK_DISPLAY[card.rank];
+  const suit = SUIT_SYMBOL[card.suit];
   return (
     <button
       type="button"
       className={classes.join(" ")}
+      style={style}
       onClick={clickable && onClick ? () => onClick(card) : undefined}
       disabled={!clickable}
       title={title ?? cardLabelLong(card)}
       aria-label={title ?? cardLabelLong(card)}
       aria-pressed={selected ? true : undefined}
     >
-      <span className="card-rank">{RANK_DISPLAY[card.rank]}</span>
-      <span className="card-suit">{SUIT_SYMBOL[card.suit]}</span>
+      <span className="card-corner card-tl">
+        <span>{rank}</span>
+        <span>{suit}</span>
+      </span>
+      <span className="card-center">
+        <span className="card-center-rank">{rank}</span>
+        <span className="card-center-suit">{suit}</span>
+      </span>
+      <span className="card-corner card-br">
+        <span>{rank}</span>
+        <span>{suit}</span>
+      </span>
     </button>
   );
 }
