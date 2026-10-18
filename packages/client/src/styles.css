@@ -1185,6 +1185,11 @@ details.panel summary {
   cursor: default;
 }
 
+/* Cards must never be dimmed by the global disabled-button opacity. */
+button.card:disabled {
+  opacity: 1;
+}
+
 .hand {
   display: flex;
   align-items: flex-end;
