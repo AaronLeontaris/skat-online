@@ -162,8 +162,13 @@ export function setupSocket(io: Server, store: TableStore): void {
       const res = applyBid(table.round, seat, parsed.data);
       if (!res.ok) return emitError(socket, "ILLEGAL", res.error);
       if (res.allPassed) {
-        if (table.settings.ramsch) startRamsch(table.round);
-        else startRound(table, table.round.roundNumber, table.round.dealerSeat);
+        if (table.settings.ramsch) {
+          console.log(`[game] Alle drei haben gepasst – Ramsch.`);
+          startRamsch(table.round);
+        } else {
+          console.log(`[game] Alle drei haben gepasst – neu gegeben (Ramsch ist deaktiviert).`);
+          startRound(table, table.round.roundNumber, table.round.dealerSeat);
+        }
       }
       void sync(io, table);
     });

@@ -183,6 +183,7 @@ export function applyBid(
           heldValue: null,
           pendingRaise: null,
         };
+        console.log(`[game] Zwei Passe ohne Gebot – Platz ${b.listenerSeat + 1} kann bieten oder passen (Ramsch).`);
         return { ok: true, allPassed: false };
       }
       // Last-chance pass (listenerSeat === null) or a held bid was declined.
