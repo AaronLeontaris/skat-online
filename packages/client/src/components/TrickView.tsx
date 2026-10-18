@@ -47,10 +47,17 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
 
       {last !== null ? (
         <div className="trick-last">
-          <button
-            type="button"
+          <div
             className="trick-last-toggle"
+            role="button"
+            tabIndex={0}
             onClick={() => setShowLast((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setShowLast((v) => !v);
+              }
+            }}
             aria-label={showLast ? "Letzten Stich verdecken" : "Letzten Stich aufdecken"}
             title={showLast ? "Letzten Stich verdecken" : "Letzten Stich aufdecken"}
           >
@@ -67,7 +74,7 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
                 ))}
               </div>
             )}
-          </button>
+          </div>
         </div>
       ) : null}
     </div>
