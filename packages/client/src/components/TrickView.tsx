@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CompletedTrick, PlayedCard, PublicPlayer } from "@skat/shared";
 import { CardView, cardKey } from "./CardView";
 
@@ -13,18 +13,34 @@ export interface TrickViewProps {
   seats: readonly (PublicPlayer | null)[];
 }
 
-/** The current trick centered on the table; the last Stich is hidden until clicked. */
+/** The current trick centered on the table; a completed trick lingers for 2s. */
 export function TrickView({ currentTrick, completedTricks, seats }: TrickViewProps): JSX.Element {
   const last = completedTricks.length > 0 ? completedTricks[completedTricks.length - 1] : null;
   const [showLast, setShowLast] = useState(false);
+  const [lingering, setLingering] = useState<readonly PlayedCard[] | null>(null);
+  const prevCount = useRef(completedTricks.length);
+
+  useEffect(() => {
+    if (completedTricks.length > prevCount.current) {
+      const just = completedTricks[completedTricks.length - 1];
+      setLingering(just.cards);
+      const timer = window.setTimeout(() => setLingering(null), 2000);
+      prevCount.current = completedTricks.length;
+      return () => window.clearTimeout(timer);
+    }
+    prevCount.current = completedTricks.length;
+  }, [completedTricks]);
+
+  // A new card in the current trick overrides the lingering display.
+  const centerCards = currentTrick.length > 0 ? currentTrick : lingering ?? [];
 
   return (
     <div className="trick-view">
       <div className="trick-current">
-        {currentTrick.length === 0 ? (
+        {centerCards.length === 0 ? (
           <span className="muted">Keine Karten im aktuellen Stich.</span>
         ) : (
-          currentTrick.map((played) => (
+          centerCards.map((played) => (
             <div key={cardKey(played.card)} className="trick-card">
               <CardView card={played.card} disabled />
               <span className="muted small">{seatLabel(seats, played.seatIndex)}</span>
