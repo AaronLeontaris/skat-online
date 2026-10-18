@@ -33,6 +33,8 @@ export interface RoundState {
   hands: Card[][]; // aligned with activeSeats
   skat: Card[];
   skatForDeclarer: Card[];
+  /** Declarer's full 10-card hand (after Skat discard) — used for matador counting. */
+  declarerFullHand: Card[];
   biddingPhase: 1 | 2;
   bidding: Bidding | null;
   declarerSeat: SeatIndex | null;
@@ -98,6 +100,7 @@ export function startRound(table: TableSession, roundNumber: number, dealerSeat:
     hands: [d.hands[0], d.hands[1], d.hands[2]],
     skat: d.skat,
     skatForDeclarer: d.skat,
+    declarerFullHand: [],
     biddingPhase: 1,
     bidding: { sayerSeat: active[1], listenerSeat: active[0], heldValue: null, pendingRaise: null },
     declarerSeat: null,
@@ -214,6 +217,7 @@ export function applyPickupSkat(
   if (payload.action === "hand") {
     round.skatTaken = false;
     round.skatForDeclarer = round.skat;
+    round.declarerFullHand = [...round.hands[idx]];
     round.phase = "announce";
     return { ok: true };
   }
@@ -226,6 +230,7 @@ export function applyPickupSkat(
   if (remaining.length !== 10) return { ok: false, error: "Ablage ungültig" };
   round.hands[idx] = remaining;
   round.skatForDeclarer = [d1, d2];
+  round.declarerFullHand = remaining;
   round.skatTaken = true;
   round.phase = "announce";
   return { ok: true };
@@ -378,12 +383,10 @@ export function scoreRound(table: TableSession, round: RoundState): RoundResult 
     result = { declarerSeat: null, won: null, gameValue: 0, deltas: deltaRows, summary };
   } else {
     const dSeat = round.declarerSeat!;
-    const dIdx = activeIndex(round, dSeat);
-    const finalHand = round.hands[dIdx];
     const d = round.declaration!;
     // In Hand games the Skat counts toward matadors (it belongs to the declarer);
-    // after a Skat pickup the final hand already reflects the discard.
-    const matHand = d.hand ? [...finalHand, ...round.skat] : finalHand;
+    // after a Skat pickup the full hand already reflects the discard.
+    const matHand = d.hand ? [...round.declarerFullHand, ...round.skat] : round.declarerFullHand;
     const matadorCount = d.kind === "null" ? 0 : computeMatadors(matHand, d.kind, d.suit).count;
     const wonTricks = round.completedTricks.filter((t) => t.winnerSeat === dSeat);
     const declarerTricks = wonTricks.length;
