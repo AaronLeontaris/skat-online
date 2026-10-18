@@ -62,7 +62,7 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
               </div>
             ) : (
               <div className="trick-cards">
-                {last.cards.map((played, i) => (
+                {last.cards.map((_, i) => (
                   <span key={i} className="card-back" aria-hidden="true" />
                 ))}
               </div>
