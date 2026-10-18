@@ -7,6 +7,7 @@ import { GameHeader } from "./GameHeader";
 import { GameView } from "./GameView";
 import { Scoreboard } from "./Scoreboard";
 import { SettingsForm } from "./SettingsForm";
+import { seatLabel } from "./gameHelpers";
 
 const SEAT_INDICES = [0, 1, 2, 3] as const;
 const ACTIVE_PHASES: readonly string[] = ["bidding", "skat", "announce", "playing", "scoring"];
@@ -47,6 +48,13 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
   const [openScores, setOpenScores] = useState(false);
   const editable = host && table.status !== "playing";
   const active = round !== null && ACTIVE_PHASES.includes(round.phase);
+  const myTurn = self.seatIndex !== null && round !== null && round.currentSeat === self.seatIndex;
+  const turnStatus =
+    round !== null && round.currentSeat !== null
+      ? myTurn
+        ? "Du bist dran"
+        : `${seatLabel(seats, round.currentSeat)} ist dran`
+      : "";
   const isDeclarer = self.seatIndex !== null && round?.declarerSeat === self.seatIndex;
   const tricksPlayed = round?.completedTricks.length ?? 0;
   const canKontra =
@@ -166,6 +174,7 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
         <>
           <div className="game-toolbar">
             <span className="round-label">Runde {round.roundNumber}</span>
+            {turnStatus ? <span className="toolbar-status">{turnStatus}</span> : null}
             <button
               type="button"
               className={openSeats ? "toolbar-btn active" : "toolbar-btn"}

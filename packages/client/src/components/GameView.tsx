@@ -61,7 +61,7 @@ function Opponent({
   return (
     <div className={`opponent${active ? " opponent-active" : ""}`}>
       <div className="opponent-avatar">
-        <Avatar username={name} avatarUrl={avatarUrl} size="medium" />
+        <Avatar username={name} avatarUrl={avatarUrl} size="large" />
         {active ? <span className="turn-dot" aria-label="am Zug" /> : null}
       </div>
       <span className="opponent-name">{name}</span>
@@ -87,8 +87,10 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
 
   const canAct = connected;
 
-  const opponents =
-    self.seatIndex !== null ? round.activeSeats.filter((s) => s !== self.seatIndex) : round.activeSeats;
+  const activeIdx = self.seatIndex !== null ? round.activeSeats.indexOf(self.seatIndex) : -1;
+  // Left = the player after you in turn order, right = the player before you.
+  const leftSeat = activeIdx >= 0 ? round.activeSeats[(activeIdx + 1) % 3] : round.activeSeats[0] ?? null;
+  const rightSeat = activeIdx >= 0 ? round.activeSeats[(activeIdx + 2) % 3] : round.activeSeats[1] ?? null;
 
   return (
     <div className="game-view">
@@ -101,12 +103,12 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
 
       <div className="game-table">
         <div className="opponents opponents-left">
-          {opponents.length > 0 ? (
+          {leftSeat !== null ? (
             <Opponent
-              name={seatLabel(seats, opponents[0])}
-              avatarUrl={seats[opponents[0]]?.avatarUrl ?? null}
-              cardCount={remainingCards(round, opponents[0])}
-              active={round.currentSeat === opponents[0]}
+              name={seatLabel(seats, leftSeat)}
+              avatarUrl={seats[leftSeat]?.avatarUrl ?? null}
+              cardCount={remainingCards(round, leftSeat)}
+              active={round.currentSeat === leftSeat}
             />
           ) : null}
         </div>
@@ -129,12 +131,12 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
         </div>
 
         <div className="opponents opponents-right">
-          {opponents.length > 1 ? (
+          {rightSeat !== null ? (
             <Opponent
-              name={seatLabel(seats, opponents[1])}
-              avatarUrl={seats[opponents[1]]?.avatarUrl ?? null}
-              cardCount={remainingCards(round, opponents[1])}
-              active={round.currentSeat === opponents[1]}
+              name={seatLabel(seats, rightSeat)}
+              avatarUrl={seats[rightSeat]?.avatarUrl ?? null}
+              cardCount={remainingCards(round, rightSeat)}
+              active={round.currentSeat === rightSeat}
             />
           ) : null}
         </div>
@@ -158,7 +160,6 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
           <HandView
             hand={self.hand}
             legalPlays={self.legalPlays}
-            ownerName={seatLabel(seats, self.seatIndex)}
             declaration={round.declaration}
             onPlay={(card) => emit("game:playCard", { card })}
           />
@@ -270,14 +271,7 @@ function Controls({ round, selfSeat, hand, seats, disabled, emit }: ControlsProp
   }
 
   if (round.phase === "playing") {
-    return (
-      <section className="panel controls">
-        <h3>Spiel</h3>
-        <p className="muted small">
-          {myTurn ? "Du bist dran – wähle eine Karte." : "Warte auf den nächsten Zug."}
-        </p>
-      </section>
-    );
+    return null;
   }
 
   if (round.phase === "scoring" || round.phase === "roundEnd") {

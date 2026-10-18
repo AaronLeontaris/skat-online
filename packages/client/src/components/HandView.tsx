@@ -8,33 +8,19 @@ export interface HandViewProps {
   /** Legal plays if it is this player's turn, else null. */
   legalPlays: readonly Card[] | null;
   onPlay: (card: Card) => void;
-  /** Player name shown in the heading. */
-  ownerName: string;
-  /** Current declaration (used to sort trumps left). */
+  /** Current declaration (used to sort trumps to the right). */
   declaration?: GameDeclaration | null;
 }
 
 /** The player's own hand. Cards are clickable only when legally playable. */
-export function HandView({ hand, legalPlays, onPlay, ownerName, declaration = null }: HandViewProps): JSX.Element {
+export function HandView({ hand, legalPlays, onPlay, declaration = null }: HandViewProps): JSX.Element | null {
   const sorted = sortHandForGame(hand, declaration);
   const playableKeys = new Set((legalPlays ?? []).map(cardKey));
 
-  if (sorted.length === 0) {
-    return (
-      <section className="panel hand-view">
-        <h2>Deine Karten</h2>
-        <p className="muted">Keine Karten (du setzt aus oder schaust zu).</p>
-      </section>
-    );
-  }
+  if (sorted.length === 0) return null;
 
   return (
     <section className="panel hand-view">
-      <h2>Deine Karten</h2>
-      <p className="muted small">
-        {ownerName}
-        {legalPlays ? " · Du bist dran" : ""}
-      </p>
       <div className="hand">
         {sorted.map((card, index) => {
           const playable = playableKeys.has(cardKey(card));

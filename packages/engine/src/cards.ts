@@ -86,28 +86,39 @@ export function sortHand(cards: readonly Card[]): Card[] {
 }
 
 /**
- * Display sort for a declared game: trumps first (strongest left), then the rest
- * by suit and value. For Grand only jacks are trumps; for a suit game jacks then
- * the trump suit. Null keeps the natural sort.
+ * Display sort for a declared game. Trumps go to the far right; non-trumps sort
+ * by suit (Karo, Herz, Pik, Kreuz) then ascending value. Within trumps, Buben are
+ * highest. Values run lowest → highest (7, 8, 9, Dame, König, 10, Ass). Null keeps
+ * the natural sort.
  */
 export function sortHandForGame(cards: readonly Card[], declaration: GameDeclaration | null): Card[] {
-  if (!declaration || declaration.kind === "null") return sortHand(cards);
+  if (!declaration || declaration.kind === "null") {
+    // Natural ascending sort: suit Karo→Kreuz, value 7→A.
+    const suitAsc: Record<Suit, number> = { diamonds: 0, hearts: 1, spades: 2, clubs: 3 };
+    const nullAsc: Record<Rank, number> = { "7": 0, "8": 1, "9": 2, "10": 3, J: 4, Q: 5, K: 6, A: 7 };
+    return [...cards].sort((a, b) => {
+      if (suitAsc[a.suit] !== suitAsc[b.suit]) return suitAsc[a.suit] - suitAsc[b.suit];
+      return nullAsc[a.rank] - nullAsc[b.rank];
+    });
+  }
 
   const trumpSuit: Suit | null = declaration.kind === "suit" ? declaration.suit ?? null : null;
   const isTrumpCard = (c: Card): boolean => c.rank === "J" || (trumpSuit !== null && c.suit === trumpSuit);
-  const trumpValue = (c: Card): number => {
-    if (c.rank === "J") return 200 + (JACK_ORDER.length - JACK_ORDER.indexOf(c.suit));
-    return 100 - SUIT_GAME_ORDER.indexOf(c.rank);
-  };
-  const suitOrder = (s: Suit) => SUITS.indexOf(s);
-  const rankOrder = (r: Rank) => SUIT_GAME_ORDER.indexOf(r);
+
+  // Suit ascending: Karo, Herz, Pik, Kreuz.
+  const suitAsc: Record<Suit, number> = { diamonds: 0, hearts: 1, spades: 2, clubs: 3 };
+  // Value ascending (Skat order reversed): 7, 8, 9, Dame, König, 10, Ass; J (Bube) highest.
+  const rankAsc: Record<Rank, number> = { "7": 0, "8": 1, "9": 2, Q: 3, K: 4, "10": 5, A: 6, J: 7 };
+  // Buben are the highest trumps: ♦J < ♥J < ♠J < ♣J.
+  const jackAsc = (s: Suit): number => 100 + (3 - JACK_ORDER.indexOf(s));
+  const trumpValue = (c: Card): number => (c.rank === "J" ? jackAsc(c.suit) : rankAsc[c.rank]);
 
   return [...cards].sort((a, b) => {
     const aTrump = isTrumpCard(a);
     const bTrump = isTrumpCard(b);
-    if (aTrump !== bTrump) return aTrump ? -1 : 1;
-    if (aTrump && bTrump) return trumpValue(b) - trumpValue(a);
-    if (suitOrder(a.suit) !== suitOrder(b.suit)) return suitOrder(a.suit) - suitOrder(b.suit);
-    return rankOrder(b.rank) - rankOrder(a.rank);
+    if (aTrump !== bTrump) return aTrump ? 1 : -1; // non-trumps left, trumps right
+    if (aTrump && bTrump) return trumpValue(a) - trumpValue(b);
+    if (suitAsc[a.suit] !== suitAsc[b.suit]) return suitAsc[a.suit] - suitAsc[b.suit];
+    return rankAsc[a.rank] - rankAsc[b.rank];
   });
 }
