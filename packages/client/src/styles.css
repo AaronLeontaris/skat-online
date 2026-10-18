@@ -829,29 +829,27 @@ label {
 
 .trick-last {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  background: rgba(20, 15, 8, 0.85);
-  border-radius: 2px;
-  padding: 0.4rem 0.6rem;
+  justify-content: center;
 }
 
 .trick-last-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   background: transparent;
   border: none;
   padding: 0.1rem 0.3rem;
   cursor: pointer;
-  color: var(--muted);
-  font-size: 0.82rem;
 }
 
-.trick-last-toggle:hover {
-  color: var(--accent);
+.trick-last .card-back {
+  width: 1.4rem;
+  height: 2rem;
+}
+
+.trick-last .card-back + .card-back {
+  margin-left: -0.6rem;
 }
 
 .game-panels {
@@ -1185,11 +1183,6 @@ details.panel summary {
 
 .card-disabled {
   cursor: default;
-}
-
-/* Unplayable hand cards: darken the color instead of making them translucent. */
-.hand .card.card-disabled {
-  filter: brightness(0.6) saturate(0.7);
 }
 
 .hand {

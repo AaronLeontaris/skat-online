@@ -37,34 +37,37 @@ export function TrickView({ currentTrick, completedTricks, seats }: TrickViewPro
   return (
     <div className="trick-view">
       <div className="trick-current">
-        {centerCards.length === 0 ? (
-          <span className="muted">Keine Karten im aktuellen Stich.</span>
-        ) : (
-          centerCards.map((played) => (
-            <div key={cardKey(played.card)} className="trick-card">
-              <CardView card={played.card} disabled />
-              <span className="muted small">{seatLabel(seats, played.seatIndex)}</span>
-            </div>
-          ))
-        )}
+        {centerCards.map((played) => (
+          <div key={cardKey(played.card)} className="trick-card">
+            <CardView card={played.card} disabled />
+            <span className="muted small">{seatLabel(seats, played.seatIndex)}</span>
+          </div>
+        ))}
       </div>
 
       {last !== null ? (
         <div className="trick-last">
-          <button type="button" className="trick-last-toggle" onClick={() => setShowLast((v) => !v)}>
-            <span>
-              Letzter Stich: <strong>{seatLabel(seats, last.winnerSeat)}</strong> · {completedTricks.length}{" "}
-              {completedTricks.length === 1 ? "Stich" : "Stiche"}
-            </span>
-            <span aria-hidden="true">{showLast ? "▾" : "▸"}</span>
+          <button
+            type="button"
+            className="trick-last-toggle"
+            onClick={() => setShowLast((v) => !v)}
+            aria-label={showLast ? "Letzten Stich verdecken" : "Letzten Stich aufdecken"}
+            title={showLast ? "Letzten Stich verdecken" : "Letzten Stich aufdecken"}
+          >
+            {showLast ? (
+              <div className="trick-cards">
+                {last.cards.map((played) => (
+                  <CardView key={cardKey(played.card)} card={played.card} disabled />
+                ))}
+              </div>
+            ) : (
+              <div className="trick-cards">
+                {last.cards.map((played, i) => (
+                  <span key={i} className="card-back" aria-hidden="true" />
+                ))}
+              </div>
+            )}
           </button>
-          {showLast ? (
-            <div className="trick-cards">
-              {last.cards.map((played) => (
-                <CardView key={cardKey(played.card)} card={played.card} disabled />
-              ))}
-            </div>
-          ) : null}
         </div>
       ) : null}
     </div>
