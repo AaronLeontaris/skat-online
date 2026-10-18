@@ -314,6 +314,7 @@ function SkatControls({ round, hand, disabled, emit }: SkatControlsProps): JSX.E
   const skat = round.skat ?? [];
 
   function toggle(card: Card): void {
+    if (card.rank === "J") return; // Buben dürfen nicht gedrückt werden
     setSelected((current) => {
       const exists = current.some((c) => sameCard(c, card));
       if (exists) return current.filter((c) => !sameCard(c, card));
@@ -361,18 +362,23 @@ function SkatControls({ round, hand, disabled, emit }: SkatControlsProps): JSX.E
     <section className="panel controls">
       <h3>Ablegen</h3>
       <p className="muted small">
-        Wähle zwei Karten zum Ablegen ({selectionCount}/2).
+        Wähle zwei Karten zum Ablegen ({selectionCount}/2). Buben dürfen nicht gedrückt werden.
         {skat.length > 0 ? ` Skat: ${cardList(skat)}` : ""}
       </p>
       <div className="hand">
-        {discardPool.map((card) => (
-          <CardView
-            key={cardKey(card)}
-            card={card}
-            selected={selected.some((c) => sameCard(c, card))}
-            onClick={toggle}
-          />
-        ))}
+        {discardPool.map((card) => {
+          const isJack = card.rank === "J";
+          return (
+            <CardView
+              key={cardKey(card)}
+              card={card}
+              selected={selected.some((c) => sameCard(c, card))}
+              disabled={isJack}
+              title={isJack ? "Buben dürfen nicht gedrückt werden" : undefined}
+              onClick={isJack ? undefined : toggle}
+            />
+          );
+        })}
       </div>
       <div className="row">
         <button type="button" className="primary" disabled={disabled || selectionCount !== 2} onClick={confirm}>

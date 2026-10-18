@@ -1,5 +1,5 @@
 import type { Card, GameDeclaration, Suit } from "./types";
-import { JACK_ORDER, SUIT_GAME_ORDER } from "./cards";
+import { JACK_ORDER } from "./cards";
 
 export const SUIT_BASE: Record<Suit, number> = {
   diamonds: 9,
@@ -15,15 +15,12 @@ export interface Matadors {
 }
 
 /**
- * Count consecutive top trumps "mit" (with) or "ohne" (without), starting from the Clubs Jack.
- * Grand: jacks only (max 4). Suit game: jacks then the trump suit A,10,K,Q,9,8,7 (max 11).
- * `suit` is required when `kind === "suit"`.
+ * Count consecutive top jacks "mit" (with) or "ohne" (without), starting from the
+ * Clubs Jack. House rule: Spitzen are counted on the four Buben only (max 4),
+ * regardless of game type (suit or Grand).
  */
-export function computeMatadors(hand: readonly Card[], kind: "suit" | "grand", suit?: Suit): Matadors {
+export function computeMatadors(hand: readonly Card[], _kind: "suit" | "grand", _suit?: Suit): Matadors {
   const sequence: Card[] = JACK_ORDER.map((s) => ({ suit: s, rank: "J" }));
-  if (kind === "suit") {
-    for (const rank of SUIT_GAME_ORDER) sequence.push({ suit: suit!, rank });
-  }
   const has = (card: Card) => hand.some((c) => c.suit === card.suit && c.rank === card.rank);
 
   if (has({ suit: "clubs", rank: "J" })) {

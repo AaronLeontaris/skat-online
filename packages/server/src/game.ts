@@ -226,6 +226,9 @@ export function applyPickupSkat(
   const [d1, d2] = payload.discard;
   const hasCard = (c: Card) => full.some((f) => f.suit === c.suit && f.rank === c.rank);
   if (!hasCard(d1) || !hasCard(d2)) return { ok: false, error: "Karte nicht in der Hand" };
+  if (d1.rank === "J" || d2.rank === "J") {
+    return { ok: false, error: "Buben dürfen nicht gedrückt werden" };
+  }
   const remaining = removeCard(removeCard(full, d1), d2);
   if (remaining.length !== 10) return { ok: false, error: "Ablage ungültig" };
   round.hands[idx] = remaining;
