@@ -35,6 +35,7 @@ export const clientPayloadSchemas: { [K in keyof ClientToServer]: z.ZodType<Clie
   "table:leave": z.object({}).strict(),
   "table:setSettings": z.object({ settings: tableSettingsSchema }),
   "table:ready": z.object({ ready: z.boolean() }),
+  "table:setCharacter": z.object({ character: z.enum(["petra", "thomas"]) }),
   "table:start": z.object({}).strict(),
   "game:bid": z.union([
     z.object({ value: z.number().int().positive() }),

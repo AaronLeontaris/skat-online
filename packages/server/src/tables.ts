@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { SeatIndex } from "@skat/engine";
-import type { TableSettings, TableStatus } from "@skat/shared";
+import type { CharacterId, TableSettings, TableStatus } from "@skat/shared";
 import type { RoundState } from "./game";
 
 export interface SeatPlayer {
@@ -9,6 +9,8 @@ export interface SeatPlayer {
   avatarUrl: string | null;
   ready: boolean;
   connected: boolean;
+  /** Character chosen for this match (null until picked). */
+  character: CharacterId | null;
 }
 
 export interface NewPlayer {
@@ -50,6 +52,7 @@ export class TableStore {
       avatarUrl: host.avatarUrl,
       ready: false,
       connected: true,
+      character: null,
     };
     this.tables.set(table.tableId, table);
     return table;
@@ -93,6 +96,7 @@ export class TableStore {
       avatarUrl: player.avatarUrl,
       ready: false,
       connected: true,
+      character: null,
     };
     return { ok: true };
   }
@@ -116,6 +120,13 @@ export class TableStore {
     if (seat === null) return;
     const player = table.seats[seat];
     if (player) player.ready = ready;
+  }
+
+  setCharacter(table: TableSession, userId: string, character: CharacterId): void {
+    const seat = this.seatOf(table, userId);
+    if (seat === null) return;
+    const player = table.seats[seat];
+    if (player) player.character = character;
   }
 
   markConnected(table: TableSession, userId: string): void {

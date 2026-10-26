@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import type { ChatMessage, SoundKind } from "@skat/shared";
+import type { CharacterId, ChatMessage, SoundKind } from "@skat/shared";
+import { characterById } from "../characters";
 
 export interface ChatProps {
   messages: ChatMessage[];
@@ -9,6 +10,8 @@ export interface ChatProps {
   collapsible?: boolean;
   /** Called when a voice-line button is pressed (plays the sound for the table). */
   onVoice?: (sound: string, kind: SoundKind) => void;
+  /** The player's chosen character; determines which voice lines are offered. */
+  character?: CharacterId | null;
 }
 
 function formatTime(iso: string): string {
@@ -18,11 +21,12 @@ function formatTime(iso: string): string {
 }
 
 /** Table chat: message list plus an input. In collapsible mode it is a floating launcher. */
-export function Chat({ messages, onSend, disabled, collapsible = false, onVoice }: ChatProps): JSX.Element {
+export function Chat({ messages, onSend, disabled, collapsible = false, onVoice, character = null }: ChatProps): JSX.Element {
   const [open, setOpen] = useState(!collapsible);
   const [seenCount, setSeenCount] = useState(0);
   const [text, setText] = useState("");
   const listRef = useRef<HTMLUListElement>(null);
+  const char = characterById(character);
 
   useEffect(() => {
     if (open) setSeenCount(messages.length);
@@ -79,17 +83,25 @@ export function Chat({ messages, onSend, disabled, collapsible = false, onVoice 
       </ul>
       {onVoice ? (
         <div className="chat-voice">
-          <button
-            type="button"
-            className="voice-btn"
-            disabled={disabled}
-            onClick={() => {
-              onSend("Hallo!");
-              onVoice("hallo", "speech");
-            }}
-          >
-            👋 Hallo
-          </button>
+          {char ? (
+            char.voiceLines.map((line) => (
+              <button
+                key={line.id}
+                type="button"
+                className="voice-btn"
+                disabled={disabled}
+                title={line.label}
+                onClick={() => {
+                  onSend(line.label);
+                  onVoice(line.id, "speech");
+                }}
+              >
+                {line.label}
+              </button>
+            ))
+          ) : (
+            <span className="muted small">Wähle im Warteraum einen Charakter für Sprachausgaben.</span>
+          )}
         </div>
       ) : null}
       <form className="chat-form" onSubmit={submit}>

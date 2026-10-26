@@ -103,7 +103,7 @@ export function SessionProvider({ children }: { children: ReactNode }): JSX.Elem
     socket.on("snapshot", (snapshot) => dispatch({ type: "snapshot", snapshot }));
     socket.on("table:updated", (table) => dispatch({ type: "table", table }));
     socket.on("chat:message", (message) => dispatch({ type: "chat", message }));
-    socket.on("sound:play", (payload) => playSound(payload.sound, payload.kind));
+    socket.on("sound:play", (payload) => playSound(payload.sound, payload.kind, payload.character));
     socket.on("error", (err) => dispatch({ type: "error", message: normalizeError(err) }));
 
     return () => {

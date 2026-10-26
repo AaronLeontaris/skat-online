@@ -2,13 +2,14 @@ import { useState } from "react";
 import type { Card, GameDeclaration, GameKind, Suit } from "@skat/engine";
 import { SUIT_SYMBOL, nextBidValue, sortHand } from "@skat/engine";
 import type {
+  CharacterId,
   ClientToServer,
   PublicPlayer,
   RoundPublicState,
   Snapshot,
 } from "@skat/shared";
-import { Avatar } from "./Avatar";
 import { CardView, cardKey, sameCard } from "./CardView";
+import { CharacterAvatar } from "./CharacterAvatar";
 import { HandView } from "./HandView";
 import { TrickView } from "./TrickView";
 import { cardList } from "./labels";
@@ -50,18 +51,20 @@ function toDeclaration(draft: DeclarationDraft): GameDeclaration {
 function Opponent({
   name,
   avatarUrl,
+  character,
   cardCount,
   active,
 }: {
   name: string;
   avatarUrl: string | null;
+  character: CharacterId | null;
   cardCount: number;
   active: boolean;
 }): JSX.Element {
   return (
     <div className={`opponent${active ? " opponent-active" : ""}`}>
       <div className="opponent-avatar">
-        <Avatar username={name} avatarUrl={avatarUrl} size="large" />
+        <CharacterAvatar character={character} username={name} avatarUrl={avatarUrl} size="large" />
         {active ? <span className="turn-dot" aria-label="am Zug" /> : null}
       </div>
       <span className="opponent-name">{name}</span>
@@ -107,6 +110,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             <Opponent
               name={seatLabel(seats, leftSeat)}
               avatarUrl={seats[leftSeat]?.avatarUrl ?? null}
+              character={seats[leftSeat]?.character ?? null}
               cardCount={remainingCards(round, leftSeat)}
               active={round.currentSeat === leftSeat}
             />
@@ -135,6 +139,7 @@ export function GameView({ snapshot, round, connected, emit }: GameViewProps): J
             <Opponent
               name={seatLabel(seats, rightSeat)}
               avatarUrl={seats[rightSeat]?.avatarUrl ?? null}
+              character={seats[rightSeat]?.character ?? null}
               cardCount={remainingCards(round, rightSeat)}
               active={round.currentSeat === rightSeat}
             />

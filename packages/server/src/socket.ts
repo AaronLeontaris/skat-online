@@ -133,6 +133,18 @@ export function setupSocket(io: Server, store: TableStore): void {
       void sync(io, table);
     });
 
+    socket.on("table:setCharacter", (raw: unknown) => {
+      const parsed = clientPayloadSchemas["table:setCharacter"].safeParse(raw);
+      if (!parsed.success) return emitError(socket, "INVALID", "Ungültige Anfrage");
+      const table = store.tableOfUser(userId);
+      if (!table) return;
+      if (table.status !== "waiting") {
+        return emitError(socket, "ILLEGAL", "Charakter nur vor dem Spiel wählbar");
+      }
+      store.setCharacter(table, userId, parsed.data.character);
+      void sync(io, table);
+    });
+
     socket.on("table:start", () => {
       const table = store.tableOfUser(userId);
       if (!table) return;
@@ -144,6 +156,9 @@ export function setupSocket(io: Server, store: TableStore): void {
       }
       if (!table.seats.every((s) => s === null || s.ready)) {
         return emitError(socket, "ILLEGAL", "Nicht alle Spieler sind bereit");
+      }
+      if (!table.seats.every((s) => s === null || s.character !== null)) {
+        return emitError(socket, "ILLEGAL", "Bitte zuerst einen Charakter wählen");
       }
       const prevDealer = table.round?.dealerSeat ?? null;
       const dealer = nextDealer(table, prevDealer);
@@ -254,7 +269,13 @@ export function setupSocket(io: Server, store: TableStore): void {
       if (!table) return;
       const parsed = clientPayloadSchemas["sound:play"].safeParse(raw);
       if (!parsed.success) return;
-      io.to(roomName(table.tableId)).emit("sound:play", parsed.data);
+      const seat = store.seatOf(table, userId);
+      const character = seat !== null ? table.seats[seat]?.character ?? null : null;
+      io.to(roomName(table.tableId)).emit("sound:play", {
+        sound: parsed.data.sound,
+        kind: parsed.data.kind,
+        character,
+      });
     });
   });
 }

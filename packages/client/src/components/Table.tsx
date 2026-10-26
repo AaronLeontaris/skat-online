@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import type { PublicPlayer, Snapshot, TableSettings } from "@skat/shared";
 import { useSession } from "../store";
-import { Avatar } from "./Avatar";
+import { CharacterAvatar } from "./CharacterAvatar";
+import { CharacterPicker } from "./CharacterPicker";
 import { Chat } from "./Chat";
 import { GameHeader } from "./GameHeader";
 import { GameView } from "./GameView";
@@ -31,16 +32,22 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
   const everyoneReady = seats
     .filter((seat): seat is PublicPlayer => seat !== null)
     .every((seat) => seat.ready);
-  const canStart = host && seated >= 3 && everyoneReady && table.status !== "playing";
+  const everyonePickedCharacter = seats
+    .filter((seat): seat is PublicPlayer => seat !== null)
+    .every((seat) => seat.character !== null);
+  const canStart =
+    host && seated >= 3 && everyoneReady && everyonePickedCharacter && table.status !== "playing";
   const startHint = !host
     ? "nur der Host startet"
     : seated < 3
       ? "mindestens 3 Spieler nötig"
       : !everyoneReady
         ? "nicht alle bereit"
-        : table.status === "playing"
-          ? "läuft bereits"
-          : "";
+        : !everyonePickedCharacter
+          ? "nicht alle haben einen Charakter"
+          : table.status === "playing"
+            ? "läuft bereits"
+            : "";
   const me = self.seatIndex !== null ? seats[self.seatIndex] ?? null : null;
   const [settingsDraft, setSettingsDraft] = useState<TableSettings>(table.settings);
   const [openSeats, setOpenSeats] = useState(false);
@@ -94,7 +101,12 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
               <span className="seat-number">Platz {seatIndex + 1}</span>
               {player ? (
                 <>
-                  <Avatar username={player.username} avatarUrl={player.avatarUrl} size="small" />
+                  <CharacterAvatar
+                    character={player.character}
+                    avatarUrl={player.avatarUrl}
+                    username={player.username}
+                    size="small"
+                  />
                   <span className="seat-name">
                     {player.username}
                     {table.hostUserId === player.userId ? " (Host)" : ""}
@@ -223,6 +235,7 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
               messages={messages}
               onSend={(text) => emit("chat:send", { text })}
               onVoice={(sound, kind) => emit("sound:play", { sound, kind })}
+              character={me?.character ?? null}
               disabled={!connected}
               collapsible
             />
@@ -233,6 +246,23 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
           <section className="panel seats-panel">
             <h2>Plätze</h2>
             {seatsContent}
+          </section>
+          <section className="panel">
+            <h2>Dein Charakter</h2>
+            {me ? (
+              <CharacterPicker
+                value={me.character}
+                avatarUrl={me.avatarUrl}
+                username={me.username}
+                onChange={(character) => emit("table:setCharacter", { character })}
+                disabled={!connected || table.status !== "waiting"}
+              />
+            ) : (
+              <p className="muted small">Du sitzt nicht an diesem Tisch.</p>
+            )}
+            <p className="muted small">
+              Jeder Spieler wählt vor dem Start Petra oder Thomas. Die Wahl bestimmt die Sprachausgaben im Chat.
+            </p>
           </section>
           <section className="panel">
             <h2>Einstellungen</h2>
@@ -266,6 +296,7 @@ export function Table({ snapshot, onOpenProfile }: TableProps): JSX.Element {
             messages={messages}
             onSend={(text) => emit("chat:send", { text })}
             onVoice={(sound, kind) => emit("sound:play", { sound, kind })}
+            character={me?.character ?? null}
             disabled={!connected}
           />
         </div>

@@ -18,6 +18,9 @@ export interface TableSettings {
 
 export type DeckType = "normal" | "turnier";
 
+/** Playable characters (each has its own portrait and voice lines). */
+export type CharacterId = "petra" | "thomas";
+
 export interface User {
   id: string;
   email: string;
@@ -45,6 +48,8 @@ export interface PublicPlayer {
   seatIndex: SeatIndex | null;
   ready: boolean;
   connected: boolean;
+  /** Chosen character for this match (Petra/Thomas), or null if not picked yet. */
+  character: CharacterId | null;
 }
 
 export interface PlayedCard {
@@ -161,6 +166,7 @@ export interface ClientToServer {
   "table:leave": Record<string, never>;
   "table:setSettings": { settings: TableSettings };
   "table:ready": { ready: boolean };
+  "table:setCharacter": { character: CharacterId };
   "table:start": Record<string, never>;
   "game:bid": { value: number } | { pass: true };
   "game:pickupSkat": { action: "take"; discard: [Card, Card] } | { action: "hand" };
@@ -176,7 +182,7 @@ export interface ServerToClient {
   snapshot: Snapshot;
   "game:event": { seq: number; event: GameEvent };
   "chat:message": ChatMessage;
-  "sound:play": { sound: string; kind: SoundKind };
+  "sound:play": { sound: string; kind: SoundKind; character?: CharacterId | null };
   error: { code: string; message: string };
   "table:updated": TablePublicState;
 }

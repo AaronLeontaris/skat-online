@@ -20,6 +20,7 @@ export function buildTablePublic(table: TableSession): TablePublicState {
             seatIndex: i as SeatIndex,
             ready: p.ready,
             connected: p.connected,
+            character: p.character,
           }
         : null,
     ),

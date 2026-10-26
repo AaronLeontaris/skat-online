@@ -1,11 +1,15 @@
-import type { SoundKind } from "@skat/shared";
+import type { CharacterId, SoundKind } from "@skat/shared";
 
 /** Sound ids → file paths served from /sounds (public). */
 const SOUND_FILES: Record<string, string> = {
   playingOneCard: "/sounds/playingOneCard.mp3",
   shuffelingCards: "/sounds/shuffelingCards.mp3",
-  hallo: "/sounds/hallo.mp3",
 };
+
+/** Voice lines live under /sounds/voice/<character>/<id>.mp3. */
+function voiceUrl(sound: string, character: CharacterId): string {
+  return `/sounds/voice/${character}/${sound}.mp3`;
+}
 
 const SOUND_KEY = "skat.sound.enabled";
 const SPEECH_KEY = "skat.speech.enabled";
@@ -43,10 +47,10 @@ export function setSpeechEnabled(value: boolean): void {
 }
 
 /** Play a sound if its category (sound / speech) is not muted. */
-export function playSound(sound: string, kind: SoundKind): void {
+export function playSound(sound: string, kind: SoundKind, character?: CharacterId | null): void {
   if (kind === "sound" && !isSoundEnabled()) return;
   if (kind === "speech" && !isSpeechEnabled()) return;
-  const url = SOUND_FILES[sound];
+  const url = kind === "speech" && character ? voiceUrl(sound, character) : SOUND_FILES[sound];
   if (!url) return;
   const audio = new Audio(url);
   void audio.play().catch(() => {
